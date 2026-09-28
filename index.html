@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aunt Hillary</title>
+    <script type="module" crossorigin src="./assets/index-CYwmHgiL.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-IzMwnBif.css">
+  </head>
+  <body>
+    <header>
+      <h1>Aunt Hillary</h1>
+      <p>No cell thinks. Bodies do. Minds act only by rewriting the rules of their own flesh.</p>
+    </header>
+    <main>
+      <section id="stage">
+        <canvas id="world" width="576" height="576"></canvas>
+        <div id="toolbar">
+          <span>Brush</span>
+          <span id="brushes"></span>
+          <button id="pause">Pause</button>
+          <label><input type="checkbox" id="rain" checked /> rain</label>
+          <label><input type="checkbox" id="graph" checked /> mind graph</label>
+          <button id="reset">Reset</button>
+        </div>
+        <div id="editor">
+          <div class="edtitle">Rule editor <small>click a cell to cycle its element</small></div>
+          <div class="rulebox">
+            <div class="pair" id="before"></div>
+            <span class="arrow" id="dirlabel">→</span>
+            <div class="pair" id="after"></div>
+            <select id="dir"></select>
+            <label>chance <input type="range" id="chance" min="0.01" max="1" step="0.01" value="0.2" /></label>
+            <button id="addGlobal" title="Everyone obeys it">Add to physics</button>
+            <button id="addOrg" title="Only the selected organism's body obeys it">Impose on selected</button>
+          </div>
+          <ol id="rulelist"></ol>
+        </div>
+      </section>
+      <aside>
+        <details id="settings">
+          <summary>Minds: <b id="mode">demo (no key)</b></summary>
+          <label>Endpoint (OpenAI-compatible)<input id="endpoint" /></label>
+          <label>Model<input id="model" placeholder="e.g. mistral-small, openai/gpt-4o-mini" /></label>
+          <label>API key <small>(kept in this browser's localStorage only)</small><input id="apikey" type="password" /></label>
+          <div class="row"><button id="useLlm">Use LLM minds</button><button id="useDemo">Demo minds</button></div>
+          <div id="llmerr"></div>
+        </details>
+        <div id="stats"></div>
+        <div id="selected"></div>
+        <h2>Conventions <small>shared by ≥2 minds, never given</small></h2>
+        <div id="conventions"></div>
+        <h2>Thoughts</h2>
+        <ol id="thoughts"></ol>
+        <h2>Events</h2>
+        <ol id="events"></ol>
+      </aside>
+    </main>
+  </body>
+</html>
