@@ -229,7 +229,12 @@ export function moveBody(world: World, id: number, heading: Heading, steps: numb
       if (walkable(cells[j])) front.push(j)
     }
     if (!front.length) break
-    const j = front[Math.floor(rng() * front.length)]
+    // Fill the hollows of the leading side first (lowest projection): the body stays compact
+    // instead of pushing out a thin arm that later snaps off.
+    let low = Infinity
+    for (const j of front) low = Math.min(low, proj(j))
+    const lows = front.filter((j) => proj(j) === low)
+    const j = lows[Math.floor(rng() * lows.length)]
     // The back cell: the rearmost along the heading (ties broken at random).
     let min = Infinity
     for (const i of mine) min = Math.min(min, proj(i))

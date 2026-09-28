@@ -330,12 +330,19 @@ export function updateOrganisms(world: World, colony: Colony, rng: () => number 
   colony.events = colony.events.slice(-30)
 }
 
+/** Drop notes that say again what a newer note says (same words, give or take a few). */
 export function dedupe(lines: string[]): string[] {
-  const seen = new Set<string>()
+  const bag = (l: string) => new Set(l.toLowerCase().match(/[a-z]{3,}/g) ?? [])
   const out: string[] = []
+  const kept: Array<Set<string>> = []
   for (const l of [...lines].reverse()) {
-    const k = l.toLowerCase().replace(/\W+/g, ' ').trim()
-    if (!seen.has(k)) seen.add(k), out.unshift(l)
+    const b = bag(l)
+    const same = kept.some((k) => {
+      let n = 0
+      for (const x of b) if (k.has(x)) n++
+      return n / Math.max(1, Math.min(b.size, k.size)) >= 0.6
+    })
+    if (!same) kept.push(b), out.unshift(l)
   }
   return out
 }

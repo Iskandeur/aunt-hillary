@@ -141,7 +141,7 @@ export function frame(sim: Sim): void {
       const { moved, ate } = moveBody(sim.world, o.id, o.heading, Math.max(1, Math.round(o.size / 12)))
       o.energy += ate * PLANT_ENERGY - moved * MOVE_COST
       if (!moved) {
-        note(o, sim.world.tick, `blocked walking ${o.heading}`)
+        if (!o.diary[o.diary.length - 1]?.includes('blocked walking')) note(o, sim.world.tick, `blocked walking ${o.heading}`)
         o.heading = null
       }
     }
