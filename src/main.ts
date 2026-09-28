@@ -51,6 +51,21 @@ $('useLlm').onclick = () => applyMode('llm')
 $('useDemo').onclick = () => applyMode('demo')
 applyMode(store.get('mode', 'demo'))
 
+// A self-hosted deployment may ship `preset.json` next to index.html ({ endpoint, model, apiKey,
+// note? }), typically pointing at a same-origin proxy that holds the real key. The public build
+// has none: the fetch 404s and nothing changes.
+fetch('./preset.json', { cache: 'no-store' })
+  .then((r) => (r.ok ? r.json() : null))
+  .then((p: { endpoint?: string; model?: string; apiKey?: string; note?: string } | null) => {
+    if (!p?.endpoint) return
+    $<HTMLInputElement>('endpoint').value = p.endpoint
+    $<HTMLInputElement>('apikey').value = p.apiKey ?? 'server-side'
+    if (!store.get('model') && p.model) $<HTMLInputElement>('model').value = p.model
+    applyMode('llm')
+    if (p.note) $('llmerr').textContent = p.note
+  })
+  .catch(() => {})
+
 // ------------------------------------------------------------------ toolbar
 
 const brushes = $('brushes')
