@@ -71,9 +71,10 @@ export function describeRule(r: Rule): string {
   return `${what} (${pct})`
 }
 
-const sig = (r: Rule) => `${r.neighbor}@${r.dir}->${r.toSelf}+${r.toNeighbor}`
+// Direction and chance left out: "eat plants above" then "eat plants beside" is the same habit.
+const sig = (r: Rule) => `${r.neighbor}->${r.toSelf}+${r.toNeighbor}`
 
-/** Rules a mind just adopted that it did not have before (chance tweaks do not count). */
+/** Rules a mind just adopted that it did not have before (a new direction or chance does not count). */
 export function newRules(before: Rule[], after: Rule[]): Rule[] {
   const had = new Set(before.map(sig))
   return after.filter((r) => !had.has(sig(r)))

@@ -41,5 +41,20 @@ aside { flex: 1; min-width: 300px; max-width: 460px; }
 .big { font-size: 28px; font-weight: 700; color: #fff; }
 .chip { display: inline-block; background: #1a1d27; border: 1px solid #2d3140; border-radius: 10px; padding: 1px 8px; margin: 2px; }
 .chip.rule { font-family: ui-monospace, monospace; font-size: 11px; }
-#thoughts, #events { padding-left: 18px; margin: 0; font-size: 12px; }
-#thoughts li, #events li { margin: 2px 0; }
+#thoughts { padding-left: 18px; margin: 0; font-size: 12px; }
+#thoughts li { margin: 2px 0; }
+#speed { display: inline-flex; border: 1px solid #2d3140; border-radius: 4px; overflow: hidden; }
+#speed button { border: 0; border-radius: 0; border-right: 1px solid #2d3140; }
+#speed button:last-child { border-right: 0; }
+#speed button.on { outline: none; background: #3a4160; color: #fff; }
+#legend { background: #10121a; border: 1px solid #23262f; border-radius: 6px; padding: 6px 10px; margin-bottom: 8px; }
+#legend summary { cursor: pointer; color: #fff; }
+#legend ul { margin: 6px 0 2px; padding-left: 16px; font-size: 12px; color: #b8bdcc; }
+#legend li { margin: 4px 0; }
+.sw { display: inline-block; width: 10px; height: 10px; background: var(--sw); border-radius: 2px; margin: 0 3px 0 2px; vertical-align: -1px; }
+#feed { list-style: none; padding: 0; margin: 0 0 10px; max-height: 260px; overflow: auto; font-size: 12.5px; }
+#feed li { padding: 4px 8px; margin: 2px 0; border-left: 3px solid var(--k, #2d3140); background: #0e1018; cursor: pointer; border-radius: 0 4px 4px 0; }
+#feed li:hover { background: #171a26; }
+#feed li.fresh { animation: fresh 2.5s ease-out; }
+#feed li small { margin-right: 6px; }
+@keyframes fresh { from { background: #2a3150; } to { background: #0e1018; } }

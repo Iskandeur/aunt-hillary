@@ -17,7 +17,7 @@
         <div id="toolbar">
           <span>Brush</span>
           <span id="brushes"></span>
-          <button id="pause">Pause</button>
+          <span id="speed" title="How fast the world runs"></span>
           <label><input type="checkbox" id="rain" checked /> rain</label>
           <label><input type="checkbox" id="graph" checked /> mind graph</label>
           <button id="reset">Reset</button>
@@ -45,14 +45,24 @@
           <div class="row"><button id="useLlm">Use LLM minds</button><button id="useDemo">Demo minds</button></div>
           <div id="llmerr"></div>
         </details>
+        <details id="legend">
+          <summary>How to read this</summary>
+          <ul>
+            <li><b>Colours:</b> <span class="sw" style="--sw:#d9bb6c"></span>sand, <span class="sw" style="--sw:#3b7ddb"></span>water, <span class="sw" style="--sw:#4fae55"></span>plant, <span class="sw" style="--sw:#5b6070"></span>wall. Bright tinted cells are living bodies; white ones are loose life that belongs to nobody.</li>
+            <li><b>A body</b> is 24 or more touching life cells. It gets a number (#12). It can split when it grows past 150 cells, or be absorbed when it touches a bigger one.</li>
+            <li><b>A mind:</b> only the 8 biggest bodies think. A thinking mind looks at its surroundings, then rewrites the rules of its own cells (eat plants, grow, turn water into plants…) and may say a word to the bodies touching it.</li>
+            <li><b>Watch:</b> a pulsing outline means that body is thinking right now; its thought then appears in a bubble. Every change is told in plain words in <i>What's happening</i>. Click a line to select that body.</li>
+            <li><b>Why it is slow:</b> Slow shows one thought at a time, about every 8 s. Only thoughts from a real model cost money; the physics is free. Use Pause / Normal / Fast to change pace.</li>
+          </ul>
+        </details>
         <div id="stats"></div>
+        <h2>What's happening <small>newest first · click a line to select the body</small></h2>
+        <ol id="feed"></ol>
         <div id="selected"></div>
         <h2>Conventions <small>shared by ≥2 minds, never given</small></h2>
         <div id="conventions"></div>
         <h2>Thoughts</h2>
         <ol id="thoughts"></ol>
-        <h2>Events</h2>
-        <ol id="events"></ol>
       </aside>
     </main>
     <script type="module" src="./src/main.ts"></script>
