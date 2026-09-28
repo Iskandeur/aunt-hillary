@@ -183,7 +183,7 @@ test('llmMind posts an OpenAI-compatible request and parses the reply', async ()
     seen.url = url
     seen.body = JSON.parse(String(init.body))
     seen.auth = (init.headers as Record<string, string>).Authorization
-    const content = '{"thought":"hm","say":"lo","rules":[{"dir":"up","neighbor":"empty","toNeighbor":"life","chance":2}]}'
+    const content = '{"thought":"hm","say":"lo","rules":[{"dir":"up","neighbor":"plant","toNeighbor":"life","chance":2}]}'
     return new Response(JSON.stringify({ choices: [{ message: { content } }] }))
   }) as typeof fetch
   try {

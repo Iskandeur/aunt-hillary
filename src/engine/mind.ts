@@ -6,6 +6,10 @@ import type { Organism } from './organisms.ts'
 
 export const MAX_RULES = 4
 export const MAX_CHANCE = 0.5
+/** Growing into empty space makes matter from nothing: kept slow (as demo minds do), so a body
+ *  grows fast only by eating. At 0.5, minds filled half the world in seconds and their bodies
+ *  split and re-merged every few frames, so most of their thoughts came back to nobody. */
+export const MAX_GROW_CHANCE = 0.05
 const BODY_ELEMENTS: ElName[] = ['empty', 'sand', 'water', 'plant', 'life']
 
 export const SYSTEM_PROMPT = `You are a mind that emerged from a colony of cells in a 2D world.
@@ -16,6 +20,8 @@ body cells. A rule rewrites a pair: one of your life cells ("self", always "life
 cell in direction dir (up, down, left, right, side, diag, any). If the neighbour is "neighbor",
 the pair becomes toSelf + toNeighbor with probability chance (max 0.5).
 Elements: empty, sand, water, plant, life. Eating a plant: neighbor plant -> toNeighbor life.
+Growing into empty space is slow (chance capped at 0.05), and past 80 cells a body grows ONLY by
+eating plants: rules that turn sand, water or empty into life stop working. To grow, eat.
 You may also say one short line to the minds touching you, and keep one short memory.
 Reply with JSON only:
 {"thought":"<=20 words","say":"<=12 words","remember":"<=15 words","rules":[{"self":"life","dir":"any","neighbor":"plant","toSelf":"life","toNeighbor":"life","chance":0.2}]}`
@@ -78,13 +84,14 @@ export function validateRule(raw: unknown): Rule | string {
     if (!BODY_ELEMENTS.includes(v as ElName)) return `bad ${k} ${String(v)}`
   const chance = Number(r.chance ?? 0.1)
   if (!Number.isFinite(chance)) return 'bad chance'
+  const grows = names.neighbor === 'empty' && names.toNeighbor === 'life'
   return {
     self: 'life',
     dir,
     neighbor: names.neighbor as ElName,
     toSelf: names.toSelf as ElName,
     toNeighbor: names.toNeighbor as ElName,
-    chance: Math.min(MAX_CHANCE, Math.max(0, chance)),
+    chance: Math.min(grows ? MAX_GROW_CHANCE : MAX_CHANCE, Math.max(0, chance)),
   }
 }
 
@@ -234,13 +241,32 @@ export interface LlmConfig {
   apiKey: string
 }
 
-export async function llmMind(cfg: LlmConfig, messages: Array<{ role: string; content: string }>, signal?: AbortSignal): Promise<{ reply: MindReply | null; errors: string[] }> {
+/** When the endpoint says it is busy (429/503) without a Retry-After, minds wait this long. */
+export const BUSY_MS = 15000
+
+export interface Busy {
+  ms: number
+  reason: string
+}
+
+export async function llmMind(cfg: LlmConfig, messages: Array<{ role: string; content: string }>, signal?: AbortSignal): Promise<{ reply: MindReply | null; errors: string[]; busy?: Busy }> {
   const res = await fetch(cfg.endpoint, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${cfg.apiKey}` },
     body: JSON.stringify({ model: cfg.model, messages, temperature: 0.9, max_tokens: 400 }),
     signal,
   })
+  // 429 / 503 mean "slow down", not "broken": the minds wait instead of reporting an error.
+  if (res.status === 429 || res.status === 503) {
+    const text = await res.text()
+    let reason = 'the endpoint is busy'
+    try {
+      const e = JSON.parse(text)?.error
+      reason = typeof e === 'string' ? e : typeof e?.message === 'string' ? e.message : reason
+    } catch {}
+    const after = Number(res.headers.get('retry-after'))
+    return { reply: null, errors: [], busy: { ms: after > 0 ? after * 1000 : BUSY_MS, reason: reason.slice(0, 120) } }
+  }
   if (!res.ok) return { reply: null, errors: [`HTTP ${res.status}: ${(await res.text()).slice(0, 160)}`] }
   const data = await res.json()
   const text: string = data?.choices?.[0]?.message?.content ?? ''

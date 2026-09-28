@@ -1,7 +1,7 @@
 import { DIRS, EL_NAMES, LIFE, paint, type Dir, type ElName, type Rule } from './engine/world.ts'
 import { activeMinds, lineage, type Organism } from './engine/organisms.ts'
 import { conventions, ruleSignature } from './engine/mind.ts'
-import { createSim, frame, setRules, think, type Sim } from './engine/sim.ts'
+import { createSim, frame, setRules, think, THOUGHT_GAP_MS, type Sim } from './engine/sim.ts'
 
 const DEFAULT_ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions'
 const CELL = 9
@@ -244,6 +244,8 @@ function renderPanel(): void {
   const alive = all.filter((o) => o.alive)
   const maxGen = Math.max(0, ...all.map((o) => o.gen))
   $('stats').innerHTML = `<b>${alive.length}</b> organisms · <b>${activeMinds(sim.colony).length}</b> minds (max 8) · <b>${all.length}</b> ever lived · generation <b>${maxGen}</b> · tick ${sim.world.tick}` +
+    (sim.llm ? `<div class="note">LLM minds take turns: one thought every ${THOUGHT_GAP_MS / 1000} s at most.</div>` : '') +
+    (sim.status ? `<div class="note">${esc(sim.status)}</div>` : '') +
     (sim.lastError ? `<div class="err">${esc(sim.lastError)}</div>` : '')
   const conv = conventions(alive, sim.rules)
   $('conventions').innerHTML = `<div class="big">${conv.total}</div>` +
@@ -283,8 +285,20 @@ function renderPanel(): void {
     `<p><small>heard</small></p><ul>${o.inbox.slice(-3).map((m) => `<li>#${m.from}: ${esc(m.text)}</li>`).join('') || '<li>(silence)</li>'}</ul>`
 }
 
+// Paid minds sleep when nobody is watching: no input for IDLE_MS and they stop calling the
+// endpoint (physics goes on). Any touch, key or mouse move wakes them.
+const IDLE_MS = 3 * 60_000
+let lastInput = performance.now()
+for (const ev of ['pointerdown', 'pointermove', 'keydown', 'wheel', 'touchstart']) {
+  addEventListener(ev, () => {
+    lastInput = performance.now()
+    sim.idle = false
+  }, { passive: true })
+}
+
 let lastPanel = 0
 function loop(now: number): void {
+  sim.idle = now - lastInput > IDLE_MS
   if (!paused) {
     frame(sim)
     think(sim, now)

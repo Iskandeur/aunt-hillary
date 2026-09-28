@@ -31,6 +31,7 @@ aside { flex: 1; min-width: 300px; max-width: 460px; }
 #stats { margin: 10px 0; color: #aab0c0; }
 #stats b { color: #fff; }
 .err, #llmerr { color: #ff8a80; font-size: 12px; }
+.note { color: #9aa3b5; font-size: 12px; }
 #selected { background: #10121a; border: 1px solid #23262f; border-radius: 6px; padding: 4px 10px 8px; }
 #selected h2 { margin-top: 6px; }
 #selected p { margin: 4px 0; }

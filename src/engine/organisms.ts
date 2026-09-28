@@ -183,6 +183,27 @@ export function updateOrganisms(world: World, colony: Colony, rng: () => number 
 }
 
 /** Growth past DIVIDE_SIZE cuts the body in two along its longer axis; the next update sees two. */
+/** Who carries on a body that is gone: the organism it merged into, or its largest living child
+ *  after a division (followed down the line). A thought that returns after its thinker changed
+ *  identity lands on the heir instead of being lost. Dissolved bodies have no heir. */
+export function heirOf(colony: Colony, org: Organism, depth = 0): Organism | null {
+  if (org.alive) return org
+  if (depth > 32) return null
+  const merged = org.fate.match(/^merged into #(\d+)$/)
+  if (merged) {
+    const into = colony.orgs.get(Number(merged[1]))
+    return into ? heirOf(colony, into, depth + 1) : null
+  }
+  if (org.fate === 'divided') {
+    const kids = [...colony.orgs.values()].filter((o) => o.parent === org.id).sort((a, b) => b.size - a.size)
+    for (const k of kids) {
+      const h = heirOf(colony, k, depth + 1)
+      if (h) return h
+    }
+  }
+  return null
+}
+
 export function divideOversized(world: World, colony: Colony): number[] {
   const { w, cells, owner } = world
   const cut: number[] = []
