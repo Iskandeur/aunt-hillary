@@ -3,6 +3,7 @@
 // label on each cell, so fusion, division and death fall out of re-labelling connected components.
 
 import { EMPTY, LIFE, type Rule, type World } from './world.ts'
+import { bornText, createFeed, dissolvedText, dividedText, mergedText, pushFeed, type Feed } from './feed.ts'
 
 export const MIN_SIZE = 24
 export const DIVIDE_SIZE = 150
@@ -36,15 +37,20 @@ export interface Organism {
   nextThink: number
   thinking: boolean
   whisper: string
+  /** Last thought shown as a bubble on the canvas until bubbleUntil (sim clock). */
+  bubble: string
+  bubbleUntil: number
 }
 
 export interface Colony {
   orgs: Map<number, Organism>
   nextId: number
   events: string[]
+  /** The same story in plain sentences, for the "What's happening" panel. */
+  feed: Feed
 }
 
-export const createColony = (): Colony => ({ orgs: new Map(), nextId: 1, events: [] })
+export const createColony = (): Colony => ({ orgs: new Map(), nextId: 1, events: [], feed: createFeed() })
 
 function newOrganism(colony: Colony, tick: number, parent: Organism | null, rng: () => number): Organism {
   const id = colony.nextId++
@@ -69,6 +75,8 @@ function newOrganism(colony: Colony, tick: number, parent: Organism | null, rng:
     nextThink: 0,
     thinking: false,
     whisper: '',
+    bubble: '',
+    bubbleUntil: 0,
   }
   colony.orgs.set(id, o)
   return o
@@ -137,6 +145,8 @@ export function updateOrganisms(world: World, colony: Colony, rng: () => number 
         return kid.id
       })
       colony.events.push(`#${parent.id} divided into ${kids.map((k) => '#' + k).join(' + ')}`)
+      const heir = [...cs].sort((a, b) => b.cells.length - a.cells.length)[0]
+      pushFeed(colony.feed, world.tick, 'divided', label.get(heir)!.id, dividedText(parent.id, kids))
     }
   }
   for (const c of comps) {
@@ -144,6 +154,7 @@ export function updateOrganisms(world: World, colony: Colony, rng: () => number 
       const o = newOrganism(colony, world.tick, null, rng)
       o.memory.push('I woke up when loose cells fused into one body.')
       colony.events.push(`#${o.id} awoke (${c.cells.length} cells fused)`)
+      pushFeed(colony.feed, world.tick, 'born', o.id, bornText(o.id, c.cells.length))
       label.set(c, o)
     }
   }
@@ -158,6 +169,7 @@ export function updateOrganisms(world: World, colony: Colony, rng: () => number 
       other.fate = `merged into #${o.id}`
       o.memory.push(...other.memory.slice(-3).map((m) => `(from #${other.id}) ${m}`))
       colony.events.push(`#${other.id} merged into #${o.id}`)
+      pushFeed(colony.feed, world.tick, 'merged', o.id, mergedText(other.id, o.id))
     }
     let sx = 0, sy = 0
     for (const i of c.cells) {
@@ -178,6 +190,7 @@ export function updateOrganisms(world: World, colony: Colony, rng: () => number 
       o.alive = false
       o.fate = 'dissolved'
       colony.events.push(`#${o.id} dissolved`)
+      pushFeed(colony.feed, world.tick, 'dissolved', o.id, dissolvedText(o.id, MIN_SIZE))
     }
   colony.events = colony.events.slice(-30)
 }

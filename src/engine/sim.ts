@@ -1,8 +1,9 @@
 // The loop that binds the two time scales: physics every frame, identities every few frames,
 // and each active mind thinking every THINK_MS (default ~5 s), asynchronously, between frames.
 
-import { activeMinds, adjacency, createColony, divideOversized, heirOf, neighborsOf, updateOrganisms, type Colony, type Organism } from './organisms.ts'
-import { applyReply, buildMessages, demoMind, llmMind, type LlmConfig, type MindReply } from './mind.ts'
+import { MAX_MINDS, activeMinds, adjacency, createColony, divideOversized, heirOf, neighborsOf, updateOrganisms, type Colony, type Organism } from './organisms.ts'
+import { INITIAL_VOCAB, applyReply, buildMessages, demoMind, llmMind, words, type LlmConfig, type MindReply } from './mind.ts'
+import { adoptedWords, newRules, pushFeed, ruleText, settleBirths, wordText } from './feed.ts'
 import { DEFAULT_RULES, LIFE, PLANT, SAND, WALL, WATER, compile, createWorld, mulberry32, paint, step, type CRule, type Rule, type World } from './world.ts'
 
 export const THINK_MS = 5000
@@ -10,6 +11,8 @@ export const IDENTITY_EVERY = 10
 /** LLM minds take turns: one thought in flight at a time, at most one new thought per THOUGHT_GAP_MS.
  *  Eight minds on a 5 s cadence would be ~96 paid calls a minute; this caps it near 20. */
 export const THOUGHT_GAP_MS = 3000
+/** How long a mind's thought stays in its bubble on the canvas. */
+export const BUBBLE_MS = 6000
 
 export interface Sim {
   world: World
@@ -30,6 +33,10 @@ export interface Sim {
   idle: boolean
   /** One short line on why minds are quiet, or '' when they think normally. */
   status: string
+  /** Last clock value seen by think(): replies that land between frames are stamped with it. */
+  clock: number
+  /** Demo thoughts waiting out their pretend latency. */
+  pending: Array<{ org: Organism; reply: MindReply; at: number }>
 }
 
 export function seedWorld(world: World): void {
@@ -50,7 +57,7 @@ export function createSim(seed = 7, w = 64, h = 64): Sim {
   const rules = DEFAULT_RULES.map((r) => ({ ...r }))
   return {
     world, colony: createColony(), rules, compiled: rules.map(compile), edges: [], llm: null, lastError: '', thoughts: [],
-    inFlight: 0, nextThoughtAt: 0, busyUntil: 0, idle: false, status: '',
+    inFlight: 0, nextThoughtAt: 0, busyUntil: 0, idle: false, status: '', clock: 0, pending: [],
   }
 }
 
@@ -78,11 +85,25 @@ export function frame(sim: Sim): void {
     divideOversized(sim.world, sim.colony)
     updateOrganisms(sim.world, sim.colony)
     sim.edges = adjacency(sim.world, sim.colony)
+    const minds = new Set(activeMinds(sim.colony).map((o) => o.id))
+    settleBirths(sim.colony.feed, (id) => minds.has(id), MAX_MINDS)
   }
 }
 
 function deliver(sim: Sim, org: Organism, reply: MindReply): void {
+  const rulesBefore = org.rules
+  const saidBefore = org.lexicon
   applyReply(org, reply)
+  const tick = sim.world.tick
+  if (reply.rules.length) for (const r of newRules(rulesBefore, org.rules).slice(0, 2)) pushFeed(sim.colony.feed, tick, 'rule', org.id, ruleText(org.id, r))
+  const others = new Set<string>()
+  for (const o of sim.colony.orgs.values()) if (o.alive && o !== org) for (const w of o.lexicon) others.add(w)
+  const fresh = words(reply.say).filter((w) => !INITIAL_VOCAB.has(w))
+  for (const w of adoptedWords(saidBefore, fresh, others)) pushFeed(sim.colony.feed, tick, 'word', org.id, wordText(org.id, w))
+  if (reply.thought) {
+    org.bubble = reply.thought
+    org.bubbleUntil = sim.clock + BUBBLE_MS
+  }
   org.whisper = ''
   if (reply.thought) sim.thoughts = [...sim.thoughts, { id: org.id, tick: sim.world.tick, text: reply.thought }].slice(-80)
   if (!reply.say) return
@@ -93,9 +114,18 @@ function deliver(sim: Sim, org: Organism, reply: MindReply): void {
   }
 }
 
-/** Wake the minds whose turn has come. Demo minds answer synchronously, each on its own cadence;
- *  LLM minds take turns (one in flight, one start per THOUGHT_GAP_MS) because every thought is paid. */
-export function think(sim: Sim, now: number, thinkMs = THINK_MS, gapMs = THOUGHT_GAP_MS): void {
+export interface ThinkOptions {
+  /** Demo minds take turns too: at most one new demo thought per demoGapMs (0 = each on its own cadence). */
+  demoGapMs?: number
+  /** A demo thought lands this long after it starts, so the page can show who is thinking. */
+  demoLatencyMs?: number
+}
+
+/** Wake the minds whose turn has come. Demo minds answer locally, each on its own cadence unless
+ *  told to take turns; LLM minds take turns (one in flight, one start per gapMs) because every
+ *  thought is paid. The UI slows gapMs down with the speed control. */
+export function think(sim: Sim, now: number, thinkMs = THINK_MS, gapMs = THOUGHT_GAP_MS, opts: ThinkOptions = {}): void {
+  sim.clock = now
   const minds = activeMinds(sim.colony)
   // Stagger first thoughts so eight minds do not all speak on the same frame.
   minds.forEach((org, k) => {
@@ -103,13 +133,29 @@ export function think(sim: Sim, now: number, thinkMs = THINK_MS, gapMs = THOUGHT
   })
   if (!sim.llm) {
     sim.status = ''
-    for (const org of minds) {
-      if (org.thinking || now < org.nextThink) continue
+    const { demoGapMs = 0, demoLatencyMs = 0 } = opts
+    for (const p of sim.pending.filter((p) => now >= p.at)) {
+      p.org.thinking = false
+      const heir = heirOf(sim.colony, p.org)
+      if (heir) deliver(sim, heir, p.reply)
+    }
+    sim.pending = sim.pending.filter((p) => now < p.at)
+    const ready = minds.filter((o) => !o.thinking && now >= o.nextThink).sort((a, b) => a.nextThink - b.nextThink)
+    for (const org of ready) {
+      if (demoGapMs > 0 && (now < sim.nextThoughtAt || sim.pending.length)) break
       org.nextThink = now + thinkMs
-      deliver(sim, org, demoMind(sim.world, org, sim.world.rng))
+      sim.nextThoughtAt = now + demoGapMs
+      const reply = demoMind(sim.world, org, sim.world.rng)
+      if (demoLatencyMs > 0) {
+        org.thinking = true
+        sim.pending.push({ org, reply, at: now + demoLatencyMs })
+      } else deliver(sim, org, reply)
     }
     return
   }
+  // Switched from demo to LLM minds mid-thought: drop the pretend thoughts.
+  for (const p of sim.pending) p.org.thinking = false
+  sim.pending = []
   // A busy answer arrives on the network's clock; convert it to ours on the next frame.
   if (sim.busyUntil < 0) sim.busyUntil = now - sim.busyUntil
   if (sim.idle) {
