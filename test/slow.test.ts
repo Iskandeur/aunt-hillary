@@ -56,11 +56,13 @@ test('the feed tells births, splits, fusions and dissolutions in plain sentences
   paint(wd, 8, 8, 3, LIFE)
   paint(wd, 20, 8, 3, LIFE)
   updateOrganisms(wd, col)
+  for (const o of col.orgs.values()) o.fusion = 'accept'
   const births = col.feed.events.filter((e) => e.kind === 'born')
   assert.equal(births.length, 2)
   assert.match(births[0].text, /^\d+ cells fused into body #\d+$/)
   for (let x = 8; x <= 20; x++) wd.cells[8 * 64 + x] = LIFE // bridge: fusion
   updateOrganisms(wd, col)
+  updateOrganisms(wd, col) // loose bridge cells join one body first, then the bodies touch
   const merged = col.feed.events.find((e) => e.kind === 'merged')!
   assert.match(merged.text, /^#\d+ was absorbed by #\d+$/)
   assert.equal(col.orgs.get(merged.id)!.alive, true, 'a click selects the survivor')
@@ -90,8 +92,8 @@ test('births learn whether they got a mind once minds are re-ranked', () => {
 test('rules and adopted words read as plain English', () => {
   const eat = { self: 'life' as const, dir: 'any' as const, neighbor: 'plant' as const, toSelf: 'life' as const, toNeighbor: 'life' as const, chance: 0.3 }
   assert.equal(describeRule(eat), 'eat plants touching it (30% per touch)')
-  assert.equal(describeRule({ ...eat, dir: 'down', neighbor: 'water', toNeighbor: 'plant', chance: 0.1 }), 'turn water below it into plant (10% per touch)')
-  assert.match(describeRule({ ...eat, neighbor: 'empty', chance: 0.05 }), /^grow into empty space/)
+  assert.equal(describeRule({ ...eat, dir: 'south', neighbor: 'water', toNeighbor: 'plant', chance: 0.1 }), 'turn water to its south into plant (10% per touch)')
+  assert.match(describeRule({ ...eat, neighbor: 'ground', chance: 0.05 }), /^grow onto bare ground/)
   assert.deepEqual(newRules([eat], [{ ...eat, chance: 0.5 }]), [], 'a chance tweak is not a new rule')
   assert.equal(newRules([], [eat]).length, 1)
   assert.deepEqual(adoptedWords(['kalu'], ['kalu', 'mito', 'zeze'], new Set(['mito'])), ['mito'])

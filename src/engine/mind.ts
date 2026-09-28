@@ -1,32 +1,45 @@
-// A mind sees only its neighbourhood, hears only adjacent minds, and acts only by emitting rules
-// for its own body. Everything it returns is parsed, validated and bounded before it touches the grid.
+// A mind sees only its neighbourhood, hears only nearby minds, and acts only through its body:
+// walking, writing rules for its own cells, speaking, giving energy, consenting to fusion.
+// Everything it returns is parsed, validated and bounded before it touches the world.
+// The prompt describes the physics and never a strategy: minds find out what works.
 
-import { DIRS, EL_NAMES, EMPTY, LIFE, PLANT, SAND, WALL, WATER, type Dir, type ElName, type Rule, type World } from './world.ts'
-import type { Organism } from './organisms.ts'
+import { DIRS, EL_NAMES, EMPTY, GRASS, LIFE, PLANT, WALL, WATER, type Dir, type ElName, type Heading, type Rule, type World } from './world.ts'
+import { MAX_ENERGY_PER_CELL, TRAITS, dedupe, lineage, type Colony, type Organism, type Temperament } from './organisms.ts'
+import { COMMON_ENGLISH } from './english.ts'
 
 export const MAX_RULES = 4
 export const MAX_CHANCE = 0.5
-/** Growing into empty space makes matter from nothing: kept slow (as demo minds do), so a body
- *  grows fast only by eating. At 0.5, minds filled half the world in seconds and their bodies
- *  split and re-merged every few frames, so most of their thoughts came back to nobody. */
+/** Growing onto anything but food makes matter from little: kept slow, so a body grows fast only
+ *  by eating. At 0.5, minds filled half the world in seconds. */
 export const MAX_GROW_CHANCE = 0.05
-const BODY_ELEMENTS: ElName[] = ['empty', 'sand', 'water', 'plant', 'life']
+const BODY_ELEMENTS: ElName[] = ['ground', 'grass', 'water', 'plant', 'life']
+const HEADINGS: Heading[] = ['north', 'south', 'east', 'west']
+/** Words for the self-portrait. */
+export const SELF_WORDS = 25
 
-export const SYSTEM_PROMPT = `You are a mind that emerged from a colony of cells in a 2D world.
-No single cell of yours thinks; together, you do. You see only your surroundings as an ASCII map:
-'o' is your own body, 'x' another organism, '.' sand, '~' water, '*' plant, '#' wall, ' ' empty.
-You cannot move or speak to the world directly. You act ONLY by writing up to 4 rules for your own
-body cells. A rule rewrites a pair: one of your life cells ("self", always "life") and one neighbour
-cell in direction dir (up, down, left, right, side, diag, any). If the neighbour is "neighbor",
-the pair becomes toSelf + toNeighbor with probability chance (max 0.5).
-Elements: empty, sand, water, plant, life. Eating a plant: neighbor plant -> toNeighbor life.
-Growing into empty space is slow (chance capped at 0.05), and past 80 cells a body grows ONLY by
-eating plants: rules that turn sand, water or empty into life stop working. To grow, eat.
-You may also say one short line to the minds touching you, and keep one short memory.
+export const SYSTEM_PROMPT = `You are a mind that emerged from a colony of cells in a 2D world seen from above.
+No single cell of yours thinks; together, you do. You see your surroundings as an ASCII map (north at the top):
+'o' your own body, 'x' another body, ',' grass, '~' water, '*' plant, '#' rock, ' ' bare ground.
+How the world works. Your body has energy. Being alive costs energy all the time, more the bigger you are.
+A plant cell that your body takes in or destroys gives energy; making a new cell of yourself costs energy.
+At zero energy your cells die one by one, and under 24 cells you are no longer a body. Plants sprout next
+to water and spread over grass. A body over 150 cells splits in two; each half inherits your rules, notes,
+story and nature. Two bodies that touch fuse into one only if both accept.
+What you can do each time you think:
+- move: walk "north", "south", "east" or "west" (you cannot cross water, rock or other bodies), or null to stay;
+- rules: up to 4 rules for your own cells. A rule rewrites a pair: one of your cells ("self" is always "life")
+  and the neighbour cell in direction dir (north, south, east, west, any). If that neighbour is "neighbor",
+  the pair becomes toSelf + toNeighbor with probability chance (max 0.5; making life from ground, grass or
+  water is capped at 0.05). Elements: ground, grass, water, plant, life;
+- say: one short line, heard only by bodies near you;
+- give: energy to a body near you, {"to":<id>,"amount":<number>};
+- fusion: "accept" or "refuse";
+- remember: one short note to keep;
+- self: who you are, in your own words, starting with "I am".
 Reply with JSON only:
-{"thought":"<=20 words","say":"<=12 words","remember":"<=15 words","rules":[{"self":"life","dir":"any","neighbor":"plant","toSelf":"life","toNeighbor":"life","chance":0.2}]}`
+{"thought":"<=20 words","self":"I am ... (<=25 words)","say":"<=12 words","remember":"<=15 words","move":null,"fusion":"accept","give":null,"rules":[]}`
 
-const GLYPH: Record<number, string> = { [EMPTY]: ' ', [WALL]: '#', [SAND]: '.', [WATER]: '~', [PLANT]: '*' }
+const GLYPH: Record<number, string> = { [EMPTY]: ' ', [WALL]: '#', [GRASS]: ',', [WATER]: '~', [PLANT]: '*' }
 
 export function asciiView(world: World, org: Organism, radius = 8): string {
   const rows: string[] = []
@@ -47,13 +60,35 @@ export function asciiView(world: World, org: Organism, radius = 8): string {
   return rows.join('\n')
 }
 
+const TRAIT_WORDS: Record<(typeof TRAITS)[number], [string, string, string]> = {
+  curiosity: ['incurious', 'somewhat curious', 'very curious'],
+  greed: ['frugal', 'somewhat greedy', 'very greedy'],
+  sociability: ['solitary', 'somewhat sociable', 'very sociable'],
+  caution: ['reckless', 'somewhat cautious', 'very cautious'],
+}
+
+/** A temperament in words, e.g. "very curious (0.82), frugal (0.10), …". */
+export function describeTemperament(t: Temperament): string {
+  return TRAITS.map((k) => `${TRAIT_WORDS[k][t[k] < 0.34 ? 0 : t[k] < 0.67 ? 1 : 2]} (${t[k].toFixed(2)})`).join(', ')
+}
+
+export function energyLine(org: Organism): string {
+  const max = org.size * MAX_ENERGY_PER_CELL
+  const state = org.energy <= 0 ? ' You are starving: your cells are dying.' : org.hungry ? ' You are hungry.' : ''
+  return `Energy ${Math.round(org.energy)} (you can hold ${max}).${state}`
+}
+
 export function buildMessages(world: World, org: Organism, neighbors: Organism[]): Array<{ role: string; content: string }> {
   const heard = org.inbox.slice(-4).map((m) => `#${m.from}: "${m.text}"`).join('\n') || '(silence)'
+  const near = neighbors.map((n) => `#${n.id} (${n.size} cells${n.fusion === 'refuse' ? ', refuses fusion' : ''})`).join(', ') || 'none'
   const user = [
-    `You are #${org.id}, generation ${org.gen}, ${org.size} cells. Time ${world.tick}.`,
-    `Your memory:\n${org.memory.map((m) => '- ' + m).join('\n') || '(empty)'}`,
-    `Your current rules: ${JSON.stringify(org.rules)}`,
-    `Minds touching you: ${neighbors.map((n) => '#' + n.id).join(', ') || 'none'}`,
+    `You are #${org.id}, generation ${org.gen}, ${org.size} cells. Time ${world.tick}. ${energyLine(org)}`,
+    `Your nature (inherited, not chosen): ${describeTemperament(org.temperament)}.`,
+    `Who you last said you are: ${org.self ? `"${org.self}"` : '(you have not said yet)'}`,
+    `What has happened to you:\n${org.diary.map((m) => '- ' + m).join('\n') || '(nothing yet)'}`,
+    `Your notes:\n${org.memory.map((m) => '- ' + m).join('\n') || '(none)'}`,
+    `Your current rules: ${JSON.stringify(org.rules)}. Walking: ${org.heading ?? 'no'}. Fusion: ${org.fusion}.`,
+    `Bodies near you: ${near}`,
     `You heard:\n${heard}`,
     org.whisper ? `A voice from outside the world whispers: "${org.whisper}"` : '',
     `Your surroundings:\n${asciiView(world, org)}`,
@@ -69,22 +104,32 @@ export interface MindReply {
   say: string
   remember: string
   rules: Rule[]
+  /** "I am…": who the mind says it is. '' keeps the previous one. */
+  self?: string
+  /** A heading, null to stop, undefined to keep walking as before. */
+  move?: Heading | null
+  fusion?: 'accept' | 'refuse'
+  give?: { to: number; amount: number } | null
 }
 
 const clip = (v: unknown, n: number): string => (typeof v === 'string' ? v.replace(/\s+/g, ' ').trim().slice(0, n) : '')
+const ALIAS: Record<string, Dir> = { up: 'north', down: 'south', left: 'west', right: 'east', n: 'north', s: 'south', e: 'east', w: 'west' }
+const ELEMENT_ALIAS: Record<string, ElName> = { empty: 'ground', sand: 'ground', soil: 'ground' }
 
 /** Validate one rule. The self cell is forced to be life: a mind only rewrites its own body. */
 export function validateRule(raw: unknown): Rule | string {
   if (!raw || typeof raw !== 'object') return 'rule is not an object'
   const r = raw as Record<string, unknown>
-  const dir = (r.dir ?? 'any') as Dir
+  const d = String(r.dir ?? 'any').toLowerCase()
+  const dir = (ALIAS[d] ?? d) as Dir
   if (!DIRS.includes(dir)) return `bad dir ${String(r.dir)}`
-  const names = { neighbor: r.neighbor, toSelf: r.toSelf ?? 'life', toNeighbor: r.toNeighbor }
+  const norm = (v: unknown) => (typeof v === 'string' ? ELEMENT_ALIAS[v] ?? v : v)
+  const names = { neighbor: norm(r.neighbor), toSelf: norm(r.toSelf ?? 'life'), toNeighbor: norm(r.toNeighbor) }
   for (const [k, v] of Object.entries(names))
     if (!BODY_ELEMENTS.includes(v as ElName)) return `bad ${k} ${String(v)}`
   const chance = Number(r.chance ?? 0.1)
   if (!Number.isFinite(chance)) return 'bad chance'
-  const grows = names.neighbor === 'empty' && names.toNeighbor === 'life'
+  const grows = names.toNeighbor === 'life' && names.neighbor !== 'plant' && names.neighbor !== 'life'
   return {
     self: 'life',
     dir,
@@ -93,6 +138,14 @@ export function validateRule(raw: unknown): Rule | string {
     toNeighbor: names.toNeighbor as ElName,
     chance: Math.min(grows ? MAX_GROW_CHANCE : MAX_CHANCE, Math.max(0, chance)),
   }
+}
+
+/** Keep the first SELF_WORDS words of a self-portrait. */
+export function clipSelf(v: unknown): string {
+  const t = clip(v, 400)
+  if (!t) return ''
+  const ws = t.split(' ')
+  return ws.length > SELF_WORDS ? ws.slice(0, SELF_WORDS).join(' ') + '…' : t
 }
 
 /** Extract the first JSON object from a model reply (fences, prose around it) and bound it. */
@@ -113,10 +166,18 @@ export function parseMindReply(text: string): { reply: MindReply | null; errors:
     if (typeof r === 'string') errors.push(r)
     else if (rules.length < MAX_RULES) rules.push(r)
   }
-  return {
-    reply: { thought: clip(data.thought, 160), say: clip(data.say, 90), remember: clip(data.remember, 110), rules },
-    errors,
+  const reply: MindReply = { thought: clip(data.thought, 160), say: clip(data.say, 90), remember: clip(data.remember, 110), rules, self: clipSelf(data.self) }
+  if ('move' in data) {
+    const m = typeof data.move === 'string' ? (ALIAS[data.move.toLowerCase()] ?? data.move.toLowerCase()) : null
+    reply.move = HEADINGS.includes(m as Heading) ? (m as Heading) : null
   }
+  if (data.fusion === 'accept' || data.fusion === 'refuse') reply.fusion = data.fusion
+  const g = data.give as Record<string, unknown> | null | undefined
+  if (g && typeof g === 'object') {
+    const to = Number(String(g.to ?? '').replace('#', '')), amount = Number(g.amount)
+    if (Number.isInteger(to) && amount > 0) reply.give = { to, amount }
+  }
+  return { reply, errors }
 }
 
 export const ruleSignature = (r: Rule): string => `${r.self}+${r.neighbor}@${r.dir}->${r.toSelf}+${r.toNeighbor}`
@@ -127,7 +188,19 @@ export function words(text: string): string[] {
 
 export const INITIAL_VOCAB = new Set([...words(SYSTEM_PROMPT), ...EL_NAMES, ...words(
   'the and you your are with for not but have this that from what who how why when where can will just all more one two',
-), ...['food', 'kin', 'rain', 'ground', 'void']]) // the demo minds' concepts are given too
+), ...['food', 'kin', 'water', 'ground', 'void', 'hungry', 'gift']]) // the demo minds' concepts are given too
+
+/** A word nobody gave the minds: absent from their prompt and from everyday English (with its
+ *  usual endings: plants, walked, eating…). "south" or "share" are not inventions. */
+export function isInvented(w: string): boolean {
+  if (INITIAL_VOCAB.has(w) || COMMON_ENGLISH.has(w)) return false
+  for (const suf of ['s', 'es', 'ed', 'd', 'ing', 'ly', 'er', 'ers', 'est', 'ness', 'ful'])
+    if (w.endsWith(suf)) {
+      const stem = w.slice(0, -suf.length)
+      if (stem.length >= 3 && (COMMON_ENGLISH.has(stem) || COMMON_ENGLISH.has(stem + 'e') || INITIAL_VOCAB.has(stem))) return false
+    }
+  return true
+}
 
 export interface Conventions {
   words: Array<{ word: string; minds: number }>
@@ -136,15 +209,15 @@ export interface Conventions {
 }
 
 /**
- * A convention is something at least two minds share that nobody gave them: a word absent from the
- * prompt they were all born with, or a rule absent from the default physics.
+ * A convention is something at least two minds share that nobody gave them: an invented word
+ * (see isInvented), or a rule absent from the default physics.
  */
 export function conventions(orgs: Iterable<Organism>, defaultRules: Rule[]): Conventions {
   const byWord = new Map<string, Set<number>>()
   const byRule = new Map<string, Set<number>>()
   const given = new Set(defaultRules.map(ruleSignature))
   for (const o of orgs) {
-    for (const w of new Set(o.lexicon)) if (!INITIAL_VOCAB.has(w)) byWord.set(w, (byWord.get(w) ?? new Set()).add(o.id))
+    for (const w of new Set(o.lexicon)) if (isInvented(w)) byWord.set(w, (byWord.get(w) ?? new Set()).add(o.id))
     for (const r of o.rules) {
       const s = ruleSignature(r)
       if (!given.has(s)) byRule.set(s, (byRule.get(s) ?? new Set()).add(o.id))
@@ -162,9 +235,12 @@ export function conventions(orgs: Iterable<Organism>, defaultRules: Rule[]): Con
 const SYLLABLES = ['ka', 'lu', 'mi', 'to', 'sen', 'pa', 'ri', 'nu', 'ze', 'ol', 'ta', 'vi', 'mo', 'ke']
 
 function inventWord(rng: () => number): string {
-  const n = 2 + Math.floor(rng() * 2)
   let w = ''
-  for (let i = 0; i < n; i++) w += SYLLABLES[Math.floor(rng() * SYLLABLES.length)]
+  do {
+    w = ''
+    const n = 2 + Math.floor(rng() * 2)
+    for (let i = 0; i < n; i++) w += SYLLABLES[Math.floor(rng() * SYLLABLES.length)]
+  } while (!isInvented(w))
   return w
 }
 
@@ -178,58 +254,88 @@ export function knownWords(org: Organism): Map<string, string> {
   return m
 }
 
+/** Where most of the plants in view are, as a heading (null when none). */
+function towardPlants(view: string): Heading | null {
+  const rows = view.split('\n').map((r) => r.slice(1, -1))
+  const c = (rows.length - 1) / 2
+  let sx = 0, sy = 0, n = 0
+  rows.forEach((row, y) => [...row].forEach((ch, x) => ch === '*' && ((sx += x - c), (sy += y - c), n++)))
+  if (!n) return null
+  return Math.abs(sx) > Math.abs(sy) ? (sx > 0 ? 'east' : 'west') : sy > 0 ? 'south' : 'north'
+}
+
+const pick = <T,>(xs: T[], rng: () => number): T => xs[Math.floor(rng() * xs.length)]
+
+/** A self-portrait assembled from nature and lived events (demo minds only). */
+export function demoSelf(org: Organism, colony: Colony | null): string {
+  const t = org.temperament
+  const top = [...TRAITS].sort((a, b) => t[b] - t[a])[0]
+  const kind = { curiosity: 'wanderer', greed: 'grazer', sociability: 'companion', caution: 'watcher' }[top]
+  const root = colony ? lineage(colony, org.id).slice(-1)[0] : org.id
+  const last = org.diary[org.diary.length - 1]?.replace(/^t\d+: /, '') ?? 'I just woke up'
+  const mood = org.energy <= 0 ? 'dying' : org.hungry ? 'hungry' : 'fed'
+  return clipSelf(`I am a ${mood} ${kind} of the line of #${root}, generation ${org.gen}; lately ${last.replace(/^I /, 'I ')}.`)
+}
+
 /**
- * A heuristic stand-in for an LLM, so the page lives on its own. It names what it sees with
- * invented words, adopts words it hears from neighbours, and writes rules from what surrounds it.
- * Memory is inherited on division, so vocabularies spread down lineages and across contact.
+ * A heuristic stand-in for an LLM, so the page lives on its own. Its temperament decides: greedy
+ * minds walk to plants and eat, curious ones wander, cautious ones refuse fusion, sociable ones
+ * talk and give energy to hungry neighbours. It names what it sees with invented words and adopts
+ * the words it hears; memory and nature are inherited on division, so both drift down lineages.
  */
-export function demoMind(world: World, org: Organism, rng: () => number): MindReply {
+export function demoMind(world: World, org: Organism, rng: () => number, colony: Colony | null = null, neighbors: Organism[] = []): MindReply {
+  const t = org.temperament
   const view = asciiView(world, org, 6)
-  const tally = { plant: 0, water: 0, empty: 0, other: 0, sand: 0 }
+  const tally = { plant: 0, water: 0, other: 0 }
   for (const ch of view) {
     if (ch === '*') tally.plant++
     else if (ch === '~') tally.water++
-    else if (ch === ' ') tally.empty++
     else if (ch === 'x') tally.other++
-    else if (ch === '.') tally.sand++
   }
-  const concept = tally.plant > 3 ? 'food' : tally.other > 3 ? 'kin' : tally.water > 6 ? 'rain' : tally.sand > 40 ? 'ground' : 'void'
+  const concept = org.hungry ? 'hungry' : tally.plant > 3 ? 'food' : tally.other > 3 ? 'kin' : tally.water > 6 ? 'water' : 'void'
   const lexicon = knownWords(org)
   let remember = ''
-  // Hearing a neighbour name the same thing: adopt its word half the time (memes travel by contact).
+  // Hearing a neighbour name something: adopt its word, more readily when sociable.
   for (const m of org.inbox.slice(-3)) {
     const [word, meaning] = m.text.split(' ')
-    if (word && meaning && /^[a-z]+$/.test(word) && lexicon.get(meaning) !== word && rng() < 0.5) {
+    if (word && meaning && /^[a-z]+$/.test(word) && lexicon.get(meaning) !== word && rng() < 0.3 + 0.5 * t.sociability) {
       lexicon.set(meaning, word)
       remember = `word "${word}" means ${meaning}`
       break
     }
   }
-  // No word yet for what it sees: coin one (this memory line wins over an adoption this turn).
   if (!lexicon.has(concept)) {
     const w = inventWord(rng)
     lexicon.set(concept, w)
     remember = `word "${w}" means ${concept}`
   }
   const rules: Rule[] = []
-  const d = (): Dir => (['up', 'down', 'side', 'any'] as Dir[])[Math.floor(rng() * 4)]
-  if (tally.plant > 0) rules.push({ self: 'life', dir: 'any', neighbor: 'plant', toSelf: 'life', toNeighbor: 'life', chance: 0.3 })
-  if (tally.water > 2) rules.push({ self: 'life', dir: d(), neighbor: 'water', toSelf: 'life', toNeighbor: 'plant', chance: 0.1 })
-  if (tally.other > 3) rules.push({ self: 'life', dir: 'any', neighbor: 'life', toSelf: 'plant', toNeighbor: 'life', chance: 0.02 })
-  if (tally.empty > 60 && org.size < 80) rules.push({ self: 'life', dir: d(), neighbor: 'empty', toSelf: 'life', toNeighbor: 'life', chance: 0.05 })
-  const word = lexicon.get(concept)!
-  const thoughts: Record<string, string> = {
-    food: 'Green things near me. My edges should turn them into me.',
-    kin: 'Another body presses against mine. I give it a little of myself.',
-    rain: 'Water all around. I will plant it.',
-    ground: 'Heavy grains below. I stay still and listen.',
-    void: 'Nothing around me. I reach out into the empty.',
+  if (tally.plant > 0) rules.push({ self: 'life', dir: 'any', neighbor: 'plant', toSelf: 'life', toNeighbor: t.greed > 0.5 ? 'life' : 'ground', chance: 0.1 + 0.3 * t.greed })
+  if (tally.water > 2 && t.curiosity > 0.5) rules.push({ self: 'life', dir: 'any', neighbor: 'grass', toSelf: 'life', toNeighbor: 'plant', chance: 0.05 })
+  const food = towardPlants(view)
+  let move: Heading | null = null
+  let why: string
+  if (food && (org.hungry || t.greed > 0.4)) (move = food), (why = `Plants to the ${food}. I go and eat.`)
+  else if (t.curiosity > 0.5 || org.hungry) (move = rng() < 0.6 && org.heading ? org.heading : pick(HEADINGS, rng)), (why = `Nothing to eat here. I walk ${move} to see.`)
+  else why = 'I stay where I am and wait.'
+  const hungryNear = neighbors.find((n) => n.hungry && n.alive)
+  let give: MindReply['give'] = null
+  if (hungryNear && !org.hungry && t.sociability > 0.5 && org.energy > org.size) {
+    give = { to: hungryNear.id, amount: Math.round(org.energy * 0.2) }
+    why = `#${hungryNear.id} is hungry. I give it some of mine.`
   }
+  const fusion: 'accept' | 'refuse' = t.caution > 0.6 && t.sociability < 0.5 ? 'refuse' : tally.other > 3 && t.caution > 0.5 ? 'refuse' : 'accept'
+  const word = lexicon.get(concept)!
+  const speaks = rng() < 0.3 + 0.7 * t.sociability || org.hungry
   return {
-    thought: org.whisper ? `A voice said "${org.whisper.slice(0, 40)}". ${thoughts[concept]}` : thoughts[concept],
-    say: `${word} ${concept}`,
+    thought: org.whisper ? `A voice said "${org.whisper.slice(0, 40)}". ${why}` : why,
+    say: speaks ? `${word} ${concept}` : '',
     remember,
     rules: rules.slice(0, MAX_RULES),
+    self: demoSelf(org, colony),
+    move,
+    fusion,
+    give,
   }
 }
 
@@ -253,7 +359,7 @@ export async function llmMind(cfg: LlmConfig, messages: Array<{ role: string; co
   const res = await fetch(cfg.endpoint, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${cfg.apiKey}` },
-    body: JSON.stringify({ model: cfg.model, messages, temperature: 0.9, max_tokens: 400 }),
+    body: JSON.stringify({ model: cfg.model, messages, temperature: 0.9, max_tokens: 500 }),
     signal,
   })
   // 429 / 503 mean "slow down", not "broken": the minds wait instead of reporting an error.
@@ -273,11 +379,15 @@ export async function llmMind(cfg: LlmConfig, messages: Array<{ role: string; co
   return parseMindReply(text)
 }
 
-/** Apply a reply to the organism: rules replace its body physics, memory and speech accumulate. */
+/** Apply a reply to the organism itself: rules, stance, walk, self-portrait, notes and words.
+ *  Giving energy involves another body, so the simulation settles it (see sim.ts). */
 export function applyReply(org: Organism, reply: MindReply): void {
   org.thought = reply.thought
   org.say = reply.say
   if (reply.rules.length) org.rules = reply.rules
-  if (reply.remember) org.memory = [...org.memory, reply.remember].slice(-8)
+  if (reply.self) org.self = reply.self
+  if (reply.move !== undefined) org.heading = reply.move
+  if (reply.fusion) org.fusion = reply.fusion
+  if (reply.remember) org.memory = dedupe([...org.memory, reply.remember]).slice(-6)
   org.lexicon = [...new Set([...org.lexicon, ...words(reply.say)])].slice(-60)
 }

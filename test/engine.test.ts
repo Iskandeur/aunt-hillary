@@ -1,18 +1,19 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { DEFAULT_RULES, EMPTY, LIFE, PLANT, SAND, WATER, applyRule, compile, count, createWorld, mulberry32, paint, step } from '../src/engine/world.ts'
+import { DEFAULT_RULES, EMPTY, LIFE, PLANT, WALL, WATER, applyRule, compile, count, createWorld, mulberry32, paint, step } from '../src/engine/world.ts'
 import { DIVIDE_SIZE, MIN_SIZE, activeMinds, adjacency, createColony, divideOversized, lineage, updateOrganisms } from '../src/engine/organisms.ts'
 import { INITIAL_VOCAB, applyReply, asciiView, conventions, demoMind, parseMindReply, validateRule } from '../src/engine/mind.ts'
 import { createSim, frame, think } from '../src/engine/sim.ts'
 
 const world = (w = 16, h = 16, seed = 1) => createWorld(w, h, mulberry32(seed))
 
-test('sand falls and conserves mass', () => {
+test('seen from above: nothing falls, water and rock stay put', () => {
   const wd = world()
-  wd.cells[2 * 16 + 5] = SAND
+  wd.cells[2 * 16 + 5] = WATER
+  wd.cells[3 * 16 + 9] = WALL
   for (let k = 0; k < 40; k++) step(wd, DEFAULT_RULES.map(compile))
-  assert.equal(count(wd, SAND), 1)
-  assert.equal(wd.cells[15 * 16 + 5] === SAND || wd.cells.slice(15 * 16).includes(SAND), true)
+  assert.equal(wd.cells[2 * 16 + 5], WATER)
+  assert.equal(wd.cells[3 * 16 + 9], WALL)
 })
 
 test('a rule fires only on a matching pair, and a swap carries ownership', () => {
@@ -20,7 +21,7 @@ test('a rule fires only on a matching pair, and a swap carries ownership', () =>
   const i = 5 * 16 + 5
   wd.cells[i] = LIFE
   wd.owner[i] = 9
-  const fall = compile({ self: 'life', dir: 'down', neighbor: 'empty', toSelf: 'empty', toNeighbor: 'life', chance: 1 })
+  const fall = compile({ self: 'life', dir: 'south', neighbor: 'ground', toSelf: 'ground', toNeighbor: 'life', chance: 1 })
   assert.equal(applyRule(wd, i, compile({ ...DEFAULT_RULES[0] })), false)
   assert.equal(applyRule(wd, i, fall), true)
   assert.equal(wd.cells[i], EMPTY)
@@ -34,7 +35,7 @@ test('eating a plant makes a life cell owned by the eater', () => {
   wd.cells[i] = LIFE
   wd.owner[i] = 3
   wd.cells[i + 1] = PLANT
-  const eat = compile({ self: 'life', dir: 'right', neighbor: 'plant', toSelf: 'life', toNeighbor: 'life', chance: 1 })
+  const eat = compile({ self: 'life', dir: 'east', neighbor: 'plant', toSelf: 'life', toNeighbor: 'life', chance: 1 })
   assert.equal(applyRule(wd, i, eat), true)
   assert.equal(wd.owner[i + 1], 3)
 })
@@ -59,9 +60,11 @@ test('fusion: two organisms whose bodies join become one, memory is merged', () 
   updateOrganisms(wd, col)
   assert.equal(activeMinds(col).length, 2)
   const [a, b] = activeMinds(col)
+  a.fusion = b.fusion = 'accept'
   b.memory.push('secret of b')
   for (let x = 8; x <= 20; x++) wd.cells[8 * 32 + x] = LIFE // a bridge
   updateOrganisms(wd, col)
+  updateOrganisms(wd, col) // loose bridge cells join one body first, then the bodies touch
   const alive = activeMinds(col)
   assert.equal(alive.length, 1)
   const survivor = alive[0]

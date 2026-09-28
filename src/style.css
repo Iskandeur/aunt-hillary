@@ -58,3 +58,9 @@ aside { flex: 1; min-width: 300px; max-width: 460px; }
 #feed li.fresh { animation: fresh 2.5s ease-out; }
 #feed li small { margin-right: 6px; }
 @keyframes fresh { from { background: #2a3150; } to { background: #0e1018; } }
+.bar { display: inline-block; width: 90px; height: 7px; background: #1a1d27; border-radius: 4px; overflow: hidden; vertical-align: middle; }
+.bar i { display: block; height: 100%; }
+.traits { border-collapse: collapse; font-size: 12px; }
+.traits td, .traits th { padding: 1px 6px 1px 0; color: #c7ccd8; font-weight: normal; text-align: left; }
+.who { color: #c9d4ff; font-style: italic; }
+small.who { font-size: 11px; }

@@ -112,8 +112,8 @@ test('growing into empty space is capped; eating is not', () => {
 test('greedy bodies cannot fill the world: past FREE_GROWTH_SIZE only eating grows them', () => {
   const sim = createSim(3)
   const greedy = [
-    { self: 'life', dir: 'any', neighbor: 'empty', toSelf: 'life', toNeighbor: 'life', chance: 0.05 },
-    { self: 'life', dir: 'any', neighbor: 'sand', toSelf: 'life', toNeighbor: 'life', chance: 0.5 },
+    { self: 'life', dir: 'any', neighbor: 'ground', toSelf: 'life', toNeighbor: 'life', chance: 0.05 },
+    { self: 'life', dir: 'any', neighbor: 'grass', toSelf: 'life', toNeighbor: 'life', chance: 0.5 },
     { self: 'life', dir: 'any', neighbor: 'water', toSelf: 'life', toNeighbor: 'life', chance: 0.5 },
   ] as const
   for (let k = 0; k < 900; k++) {

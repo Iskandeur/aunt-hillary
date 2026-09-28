@@ -3,7 +3,7 @@
 
 import type { Dir, Rule } from './world.ts'
 
-export type FeedKind = 'born' | 'divided' | 'merged' | 'dissolved' | 'rule' | 'word'
+export type FeedKind = 'born' | 'divided' | 'merged' | 'dissolved' | 'rule' | 'word' | 'hunger' | 'refused' | 'gave' | 'self'
 
 export interface FeedEvent {
   /** Increasing sequence number (stable key for the UI). */
@@ -41,7 +41,11 @@ const ids = (xs: number[]) => {
 export const bornText = (id: number, cells: number) => `${cells} cells fused into body #${id}`
 export const dividedText = (parent: number, kids: number[]) => `#${parent} split into ${ids(kids)}; they keep its memory`
 export const mergedText = (absorbed: number, into: number) => `#${absorbed} was absorbed by #${into}`
-export const dissolvedText = (id: number, minSize: number) => `#${id} fell apart (under ${minSize} cells, it is no longer a body)`
+export const dissolvedText = (id: number, minSize: number, starved = false) => starved ? `#${id} starved to death (its body fell under ${minSize} cells)` : `#${id} fell apart (under ${minSize} cells, it is no longer a body)`
+export const starvingText = (id: number) => `#${id} is starving: out of energy, its cells are dying`
+export const refusedText = (who: number, other: number) => `#${who} touched #${other} and refused to fuse`
+export const gaveText = (from: number, to: number, amount: number) => `#${from} gave ${Math.round(amount)} energy to #${to}`
+export const selfText = (id: number, self: string) => `#${id} now says who it is: “${self}”`
 
 /** Finish a birth line once we know whether the newcomer ranks among the thinking bodies. */
 export function settleBirths(feed: Feed, hasMind: (id: number) => boolean, maxMinds: number): void {
@@ -53,8 +57,7 @@ export function settleBirths(feed: Feed, hasMind: (id: number) => boolean, maxMi
 }
 
 const WHERE: Record<Dir, string> = {
-  up: 'above it', down: 'below it', left: 'on its left', right: 'on its right',
-  side: 'beside it', diag: 'diagonal to it', any: 'touching it',
+  north: 'to its north', south: 'to its south', east: 'to its east', west: 'to its west', any: 'touching it',
 }
 
 /** A rule in plain English, from the point of view of the body that obeys it. */
@@ -63,7 +66,7 @@ export function describeRule(r: Rule): string {
   const pct = `${Math.round(r.chance * 100)}% per touch`
   let what: string
   if (r.neighbor === 'plant' && r.toNeighbor === 'life') what = `eat plants ${where}`
-  else if (r.neighbor === 'empty' && r.toNeighbor === 'life') what = `grow into empty space ${where}`
+  else if (r.neighbor === 'ground' && r.toNeighbor === 'life') what = `grow onto bare ground ${where}`
   else if (r.neighbor === 'life' && r.toNeighbor === 'life' && r.toSelf !== 'life') what = `give its cells to the body ${where}`
   else if (r.neighbor === r.toNeighbor) what = `leave ${r.neighbor} ${where} as it is`
   else what = `turn ${r.neighbor} ${where} into ${r.toNeighbor}`

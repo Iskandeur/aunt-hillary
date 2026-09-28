@@ -1,5 +1,5 @@
-import { DIRS, EL_NAMES, LIFE, paint, type Dir, type ElName, type Rule } from './engine/world.ts'
-import { activeMinds, heirOf, lineage, type Organism } from './engine/organisms.ts'
+import { DEFAULT_RAIN, DIRS, EL_NAMES, LIFE, paint, type Dir, type ElName, type Rule } from './engine/world.ts'
+import { MAX_ENERGY_PER_CELL, TRAITS, activeMinds, drift, heirOf, lineage, type Organism } from './engine/organisms.ts'
 import { conventions, ruleSignature } from './engine/mind.ts'
 import { createSim, frame, setRules, think, BUBBLE_MS, THINK_MS, type Sim } from './engine/sim.ts'
 import { PACES, SPEEDS, parseSpeed, stepsDue, type Speed } from './engine/pace.ts'
@@ -8,11 +8,11 @@ import type { FeedKind } from './engine/feed.ts'
 const DEFAULT_ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions'
 const CELL = 9
 const COLORS: Record<ElName, string> = {
-  empty: '#0d0f16',
-  wall: '#5b6070',
-  sand: '#d9bb6c',
+  ground: '#6b5a44',
+  rock: '#4a4d57',
+  grass: '#2c4a2a',
   water: '#3b7ddb',
-  plant: '#4fae55',
+  plant: '#7fd86a',
   life: '#e8e8e8',
 }
 
@@ -103,7 +103,7 @@ setSpeed(speed)
 const legend = $<HTMLDetailsElement>('legend')
 legend.open = store.get('legend', 'open') === 'open'
 legend.ontoggle = () => store.set('legend', legend.open ? 'open' : 'closed')
-$<HTMLInputElement>('rain').onchange = (e) => (sim.world.rain = (e.target as HTMLInputElement).checked ? 0.004 : 0)
+$<HTMLInputElement>('rain').onchange = (e) => (sim.world.rain = (e.target as HTMLInputElement).checked ? DEFAULT_RAIN : 0)
 $<HTMLInputElement>('graph').onchange = (e) => (showGraph = (e.target as HTMLInputElement).checked)
 $('reset').onclick = () => {
   const llm = sim.llm
@@ -149,7 +149,7 @@ function nearestOrganism(x: number, y: number): number | null {
 
 // ------------------------------------------------------------------ rule editor (before → after)
 
-const draft: Rule = { self: 'sand', dir: 'down', neighbor: 'water', toSelf: 'plant', toNeighbor: 'plant', chance: 0.2 }
+const draft: Rule = { self: 'water', dir: 'any', neighbor: 'ground', toSelf: 'water', toNeighbor: 'plant', chance: 0.02 }
 const cycle = (e: ElName): ElName => EL_NAMES[(EL_NAMES.indexOf(e) + 1) % EL_NAMES.length]
 function cellButton(key: 'self' | 'neighbor' | 'toSelf' | 'toNeighbor'): HTMLButtonElement {
   const b = document.createElement('button')
@@ -325,7 +325,7 @@ function bubble(o: Organism, now: number): void {
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!)
 
 const FEED_COLORS: Record<FeedKind, string> = {
-  born: '#5fd07a', divided: '#4fc3e8', merged: '#f0a24a', dissolved: '#7c8294', rule: '#b48cff', word: '#f2d15c',
+  born: '#5fd07a', divided: '#4fc3e8', merged: '#f0a24a', dissolved: '#7c8294', rule: '#b48cff', word: '#f2d15c', hunger: '#e86a5f', refused: '#d88bd0', gave: '#7ee0c3', self: '#c9d4ff',
 }
 let feedShown = -1
 let feedSim: Sim | null = null
@@ -337,7 +337,7 @@ function renderFeed(): void {
   feedShown = feed.seq
   $('feed').innerHTML = feed.events.slice(-25).reverse().map((e) =>
     `<li data-id="${e.id}" style="--k:${FEED_COLORS[e.kind]}"${e.n > seen ? ' class="fresh"' : ''}>${esc(e.text)}</li>`,
-  ).join('') || '<li class="hint">Nothing yet. Life cells need to clump into a body of 24 or more.</li>'
+  ).join('') || '<li class="hint">Nothing yet. Life cells need to form a body of 24 or more.</li>'
 }
 $('feed').onclick = (ev) => {
   const li = (ev.target as HTMLElement).closest('li[data-id]') as HTMLElement | null
@@ -360,7 +360,7 @@ function renderPanel(): void {
     conv.rules.slice(0, 4).map((r) => `<span class="chip rule">${esc(r.sig)} <small>×${r.minds}</small></span>`).join('')
   $('thoughts').innerHTML = sim.thoughts.slice(-12).reverse().map((t) => {
     const o = sim.colony.orgs.get(t.id)
-    return `<li><b style="color:hsl(${o?.hue ?? 0} 80% 70%)">#${t.id}</b> ${esc(t.text)}</li>`
+    return `<li><b style="color:hsl(${o?.hue ?? 0} 80% 70%)">#${t.id}</b> ${esc(t.text)}${t.self ? `<br><small class="who">${esc(t.self)}</small>` : ''}</li>`
   }).join('')
   renderFeed()
   const o = selected != null ? sim.colony.orgs.get(selected) : undefined
@@ -382,12 +382,21 @@ function renderPanel(): void {
       inp.value = ''
     }
   }
+  const max = Math.max(1, o.size * MAX_ENERGY_PER_CELL)
+  const bar = (v: number, color: string) => `<span class="bar"><i style="width:${Math.round(Math.min(1, Math.max(0, v)) * 100)}%;background:${color}"></i></span>`
+  const chain = lineage(sim.colony, o.id).map((id) => sim.colony.orgs.get(id)!).filter(Boolean)
   $('selbody').innerHTML = `<p>${o.alive ? `${o.size} cells, generation ${o.gen}` : `gone: ${esc(o.fate)}`}` +
     `${o.thinking ? ' · <i>thinking…</i>' : ''}${o.whisper ? ' · whisper pending' : ''}</p>` +
+    `<p class="who"><small>who I am</small><br>${esc(o.self || '(has not said yet)')}</p>` +
+    `<p><small>energy</small> ${bar(o.energy / max, o.energy <= 0 ? '#e86a5f' : o.hungry ? '#f0a24a' : '#5fd07a')} ${Math.round(o.energy)}${o.hungry ? ' · hungry' : ''}</p>` +
+    `<p><small>walking</small> ${o.heading ?? 'no'} · <small>fusion</small> ${o.fusion}</p>` +
     `<p class="thought">${esc(o.thought || '(no thought yet)')}</p>` +
     `<p><small>says</small> “${esc(o.say)}”</p>` +
-    `<p><small>lineage</small> ${lineage(sim.colony, o.id).map((id) => '#' + id).join(' ← ')}</p>` +
-    `<p><small>memory</small></p><ul>${o.memory.map((m) => `<li>${esc(m)}</li>`).join('')}</ul>` +
+    `<p><small>nature (inherited)</small></p><table class="traits">${TRAITS.map((t) => `<tr><td>${t}</td><td>${bar(o.temperament[t], `hsl(${o.hue} 70% 60%)`)}</td><td>${o.temperament[t].toFixed(2)}</td></tr>`).join('')}</table>` +
+    `<p><small>lineage: how the nature drifted</small> (max drift ${drift(sim.colony, o.id).toFixed(2)})</p><table class="traits lineage"><tr><th></th>${TRAITS.map((t) => `<th>${t.slice(0, 4)}</th>`).join('')}</tr>` +
+    chain.slice(0, 6).map((a) => `<tr><td>#${a.id}</td>${TRAITS.map((t) => `<td>${a.temperament[t].toFixed(2)}</td>`).join('')}</tr>`).join('') + `</table>` +
+    `<p><small>what happened to me</small></p><ul>${o.diary.slice().reverse().map((m) => `<li>${esc(m)}</li>`).join('') || '<li>(nothing yet)</li>'}</ul>` +
+    `<p><small>notes</small></p><ul>${o.memory.map((m) => `<li>${esc(m)}</li>`).join('') || '<li>(none)</li>'}</ul>` +
     `<p><small>body rules</small></p><ul>${o.rules.map((r) => `<li>${esc(ruleText(r))}</li>`).join('') || '<li>(default physics only)</li>'}</ul>` +
     `<p><small>heard</small></p><ul>${o.inbox.slice(-3).map((m) => `<li>#${m.from}: ${esc(m.text)}</li>`).join('') || '<li>(silence)</li>'}</ul>`
 }
