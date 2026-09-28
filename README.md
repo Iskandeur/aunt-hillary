@@ -25,7 +25,7 @@ crossing [CellPond](https://cellpond.cool)-style drawn rewrite rules with
    one line to its neighbours, one memory, and up to 4 rules that apply **only to its own life
    cells**. Everything is validated and bounded (the self cell is forced to `life`, chance ≤ 0.5,
    no walls). The physics keeps running between thoughts.
-5. **Division is reproduction.** A body past 150 cells is cut in two. Both children inherit the
+5. **Division is reproduction.** A body past 90 cells is cut in two. Both children inherit the
    parent's memory and rules; bodies that grow into each other fuse, and the survivor absorbs the
    other's recent memories. Lineage and inherited ideas are visible in the side panel.
 

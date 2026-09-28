@@ -4,7 +4,7 @@
 // The prompt describes the physics and never a strategy: minds find out what works.
 
 import { DIRS, EL_NAMES, EMPTY, GRASS, LIFE, PLANT, WALL, WATER, type Dir, type ElName, type Heading, type Rule, type World } from './world.ts'
-import { MAX_ENERGY_PER_CELL, TRAITS, dedupe, lineage, type Colony, type Organism, type Temperament } from './organisms.ts'
+import { DIVIDE_SIZE, MAX_ENERGY_PER_CELL, MIN_SIZE, TRAITS, dedupe, lineage, type Colony, type Organism, type Temperament } from './organisms.ts'
 import { COMMON_ENGLISH } from './english.ts'
 
 export const MAX_RULES = 4
@@ -22,8 +22,8 @@ No single cell of yours thinks; together, you do. You see your surroundings as a
 'o' your own body, 'x' another body, ',' grass, '~' water, '*' plant, '#' rock, ' ' bare ground.
 How the world works. Your body has energy. Being alive costs energy all the time, more the bigger you are.
 A plant cell that your body takes in or destroys gives energy; making a new cell of yourself costs energy.
-At zero energy your cells die one by one, and under 24 cells you are no longer a body. Plants sprout next
-to water and spread over grass. A body over 150 cells splits in two; each half inherits your rules, notes,
+At zero energy your cells die one by one, and under ${MIN_SIZE} cells you are no longer a body. Plants sprout next
+to water and spread over grass. A body over ${DIVIDE_SIZE} cells splits in two; each half inherits your rules, notes,
 story and nature. Two bodies that touch fuse into one only if both accept.
 What you can do each time you think:
 - move: walk "north", "south", "east" or "west" (you cannot cross water, rock or other bodies), or null to stay;

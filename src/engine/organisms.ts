@@ -8,7 +8,8 @@ import { EMPTY, LIFE, PLANT, type Heading, type Rule, type World } from './world
 import { bornText, createFeed, dissolvedText, dividedText, mergedText, pushFeed, refusedText, starvingText, type Feed } from './feed.ts'
 
 export const MIN_SIZE = 24
-export const DIVIDE_SIZE = 150
+/** At 150, one body swallowed every newcomer and hovered just under the line: nobody ever divided. */
+export const DIVIDE_SIZE = 90
 export const MAX_MINDS = 8
 
 // ---------------------------------------------------------------- energy (what is at stake)
