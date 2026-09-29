@@ -161,3 +161,47 @@ it (tested); the fuel is eating. That boom is the first thing to tend next seaso
 
 **Walking bodies stay whole.** Measured for the first time: outside the booms, bodies split by accident
 (below the split size) at most 2 times in 5 minutes, compactness ~0.8, about 10 stray cells on the map.
+
+### Season 5 — grow up before you split again (kept)
+
+**Why this.** Season 4 found a boom: "eat plants by growing onto them" pays for itself (+1 energy and +1
+cell per plant), every half inherits the habit, and a line can split hundreds of times in five minutes
+before it starves. David Ackley's *robust-first* lesson: a local rule should never be able to put the
+whole world in a loop.
+
+**Free bench first** (no model, 6,000 frames = 5 min at Normal, 3 seeds, every body given the rule). A
+minimum age alone was worse: the young halves kept eating and one grew to 2,600 cells. Making growth
+cost more (2.5 or 3 instead of 2) barely helped. What worked: a half born of a split must live 600
+frames before it grows past 90 cells *or* splits again.
+
+| Bench (3 seeds) | Before | After |
+|-------|--------|-------|
+| boom rules: divisions · max generation · starved · biggest body | 100-104 · 14-21 · 70-83 · 142-289 | 35-36 · 4 · 41-42 · 183-213 |
+| eating only: divisions · max generation · starved | 181-230 · 27-35 · 100-132 | 43-48 · 5 · 37-42 |
+| no rules | 0 divisions | 0 divisions |
+
+**Hypothesis.** If a half has to grow up first, the boom disappears (Life) while bodies still divide
+(Evolution), and nothing else collapses.
+
+**Change.** One constant (`MATURE_AGE` = 600 frames, ~30 s at Normal) and one clause in the system
+prompt (*"and must live a while before it grows that big again"*).
+
+| Dimension | Before (4242 — 4243) | After (4242 — 4243) |
+|-----------|--------|-------|
+| Life: mean living bodies · divisions/min · starved/min | 3.37 · 6.5 · 0.79 — 3.07 · 0 · 1.18 | 3.07 · 0 · 0.2 — 3.17 · 0.2 · 0.2 |
+| Evolution: max generation · children | 23 · 66 — 0 · 0 | 0 · 0 — 1 · 2 |
+| Individuality: distinct "I am" | 2.7 — 2.23 | 2.93 — 2.93 |
+| Bonds: gifts · replies naming another · recurring pairs | 0 · 5/67 · 1 — 0 · 0/63 · 0 | 0 · 20/70 · 4 — 0 · 7/73 · 1 |
+| Language: invented words said | 0 — 0 | 0 — 0 |
+| Moments at Slow: seconds between | 7 — 20 | 17 — 21 |
+| Cost €/h | 0.35 — 0.32 | ~0.36 — 0.38 |
+| Complexity: legend · prompt tokens · actions | 5 · 441 · 8 | 5 · 455 · 8 |
+
+**Verdict.** Kept. Before, one run of two boomed again (33 splits, generation 23 in five minutes);
+after, none did, and starvation fell from about one death a minute to 0.2. The live runs cannot prove
+the rule stopped a boom (the after runs split once in total); the bench does: with the boom rules
+forced on everyone, the deepest line goes from generation 14-21 to 4. The price is one concept and 14
+prompt tokens. Bodies still divide, but live divisions stay rare: Evolution is the dimension to watch.
+
+*Measurement note: a first pair of before-runs was thrown away. The model provider failed (502/503)
+during them and minds thought 22-30 times instead of 60-70.*
