@@ -24,7 +24,7 @@ How the world works. Your body has energy. Being alive costs energy all the time
 A plant cell that your body takes in or destroys gives energy; making a new cell of yourself costs energy.
 At zero energy your cells die one by one, and under ${MIN_SIZE} cells you are no longer a body. Plants sprout next
 to water and spread over grass. A body over ${DIVIDE_SIZE} cells splits in two; each half inherits your rules, notes,
-story and nature. Two bodies that touch fuse into one only if both accept.
+story and nature, and must live a while before it grows that big again. Two bodies that touch fuse into one only if both accept.
 What you can do each time you think:
 - move: walk "north", "south", "east" or "west" (you cannot cross water, rock or other bodies), or null to stay;
 - rules: up to 4 rules for your own cells. A rule rewrites a pair: one of your cells ("self" is always "life")

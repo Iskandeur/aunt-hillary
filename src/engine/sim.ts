@@ -1,7 +1,7 @@
 // The loop that binds the two time scales: physics every frame, identities every few frames,
 // and each active mind thinking every THINK_MS (default ~5 s), asynchronously, between frames.
 
-import { GROW_COST, MAX_MINDS, MOVE_COST, PLANT_ENERGY, activeMinds, adjacency, createColony, divideOversized, heirOf, metabolize, neighborsOf, note, updateOrganisms, type Colony, type Organism } from './organisms.ts'
+import { DIVIDE_SIZE, GROW_COST, MAX_MINDS, MOVE_COST, PLANT_ENERGY, activeMinds, adjacency, createColony, divideOversized, heirOf, isYoung, metabolize, neighborsOf, note, updateOrganisms, type Colony, type Organism } from './organisms.ts'
 import { applyReply, buildMessages, demoMind, isInvented, llmMind, words, type LlmConfig, type MindReply } from './mind.ts'
 import { adoptedWords, gaveText, newRules, pushFeed, ruleText, selfText, settleBirths, wordText } from './feed.ts'
 import { DEFAULT_RAIN, DEFAULT_RULES, EMPTY, GRASS, LIFE, PLANT, WALL, WATER, compile, createWorld, moveBody, mulberry32, paint, step, type CRule, type Ledger, type Rule, type World } from './world.ts'
@@ -95,10 +95,14 @@ export const MOVE_EVERY = 2
 export const MIN_BODIES = 3
 export const SPAWN_EVERY = 200
 
-/** The ledger that makes rules pay: growth needs energy, eating earns it. */
-function ledgerOf(colony: Colony): Ledger {
+/** The ledger that makes rules pay: growth needs energy, eating earns it; a young body stops at DIVIDE_SIZE. */
+function ledgerOf(colony: Colony, tick: number): Ledger {
   return {
-    can: (id, grew) => (colony.orgs.get(id)?.energy ?? 0) >= grew * GROW_COST,
+    can: (id, grew) => {
+      const o = colony.orgs.get(id)
+      if (!o || (o.size >= DIVIDE_SIZE && isYoung(o, tick))) return false
+      return o.energy >= grew * GROW_COST
+    },
     book: (id, e) => {
       const o = colony.orgs.get(id)
       if (o) o.energy += e.ate * PLANT_ENERGY - e.grew * GROW_COST
@@ -134,7 +138,7 @@ export function frame(sim: Sim): void {
     const rules = o.size >= FREE_GROWTH_SIZE ? o.rules.filter((r) => !makesLifeFromNonFood(r)) : o.rules
     if (rules.length) orgRules.set(o.id, rules.map(compile))
   }
-  step(sim.world, sim.compiled, orgRules, ledgerOf(sim.colony))
+  step(sim.world, sim.compiled, orgRules, ledgerOf(sim.colony, sim.world.tick))
   if (sim.world.tick % MOVE_EVERY === 0)
     for (const o of sim.colony.orgs.values()) {
       if (!o.alive || !o.heading) continue

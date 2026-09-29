@@ -10,6 +10,11 @@ import { bornText, createFeed, dissolvedText, dividedText, mergedText, pushFeed,
 export const MIN_SIZE = 24
 /** At 150, one body swallowed every newcomer and hovered just under the line: nobody ever divided. */
 export const DIVIDE_SIZE = 90
+/** A body born of a division must live this many frames before it grows past DIVIDE_SIZE or splits
+ *  again. Without it, eating-while-growing paid for itself, each half inherited the habit, and a
+ *  colony went from one body to hundreds in five minutes, then starved. */
+export const MATURE_AGE = 600
+export const isYoung = (o: Organism, tick: number): boolean => o.parent !== null && tick - o.born < MATURE_AGE
 export const MAX_MINDS = 8
 
 // ---------------------------------------------------------------- energy (what is at stake)
@@ -410,12 +415,13 @@ export function heirOf(colony: Colony, org: Organism, depth = 0): Organism | nul
   return null
 }
 
-/** Growth past DIVIDE_SIZE cuts the body in two along its longer axis; the next update sees two. */
+/** Growth past DIVIDE_SIZE cuts a grown-up body in two along its longer axis; the next update sees two. */
 export function divideOversized(world: World, colony: Colony): number[] {
   const { w, cells, owner } = world
   const cut: number[] = []
   for (const o of colony.orgs.values()) {
     if (!o.alive || o.size <= DIVIDE_SIZE) continue
+    if (isYoung(o, world.tick)) continue
     let minX = Infinity, maxX = -1, minY = Infinity, maxY = -1
     for (let i = 0; i < owner.length; i++) {
       if (owner[i] !== o.id) continue

@@ -3,7 +3,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { EMPTY, LIFE, PLANT, WATER, applyRule, compile, count, createWorld, moveBody, mulberry32, paint } from '../src/engine/world.ts'
-import { DIVIDE_SIZE, GROW_COST, PLANT_ENERGY, TRAITS, activeMinds, createColony, divideOversized, kinship, metabolize, mutate, updateOrganisms } from '../src/engine/organisms.ts'
+import { DIVIDE_SIZE, GROW_COST, MATURE_AGE, PLANT_ENERGY, TRAITS, activeMinds, createColony, divideOversized, isYoung, kinship, metabolize, mutate, updateOrganisms } from '../src/engine/organisms.ts'
 import { SYSTEM_PROMPT, buildMessages, demoMind, isInvented, parseMindReply } from '../src/engine/mind.ts'
 import { createSim, frame, giveEnergy, think } from '../src/engine/sim.ts'
 
@@ -95,6 +95,36 @@ test('children inherit nature (with a small mutation), story and self-portrait',
   assert.ok(Math.abs(kids[0].energy + kids[1].energy - 100) < 1e-9)
   const m = mutate(p.temperament, mulberry32(1), 0)
   assert.deepEqual(m, p.temperament)
+})
+
+test('a half born of a split must grow up before it splits again', () => {
+  const wd = createWorld(60, 40, mulberry32(5))
+  for (let y = 10; y < 20; y++) for (let x = 5; x < 45; x++) wd.cells[y * 60 + x] = LIFE
+  const col = createColony()
+  updateOrganisms(wd, col)
+  divideOversized(wd, col)
+  updateOrganisms(wd, col)
+  const kids = activeMinds(col)
+  assert.equal(kids.length, 2)
+  for (const k of kids) assert.ok(k.size > DIVIDE_SIZE && isYoung(k, wd.tick))
+  assert.deepEqual(divideOversized(wd, col), [])
+  wd.tick += MATURE_AGE
+  assert.deepEqual(divideOversized(wd, col).sort(), kids.map((k) => k.id).sort())
+})
+
+test('a colony that eats while growing no longer explodes into hundreds of generations', () => {
+  const sim = createSim(4242)
+  const rules = [
+    { self: 'life', dir: 'any', neighbor: 'plant', toSelf: 'life', toNeighbor: 'life', chance: 0.2 },
+    { self: 'life', dir: 'any', neighbor: 'grass', toSelf: 'life', toNeighbor: 'life', chance: 0.03 },
+  ] as const
+  for (let k = 0; k < 3000; k++) {
+    for (const o of sim.colony.orgs.values()) if (o.alive && !o.rules.length) o.rules = rules.map((r) => ({ ...r }))
+    frame(sim)
+  }
+  const orgs = [...sim.colony.orgs.values()]
+  assert.ok(orgs.some((o) => o.fate === 'divided'), 'bodies still divide')
+  assert.ok(Math.max(...orgs.map((o) => o.gen)) <= 6, `generation ${Math.max(...orgs.map((o) => o.gen))} in 3000 frames`)
 })
 
 test('siblings know each other: the diary names the sibling, the prompt tags kin and not strangers', () => {
