@@ -3,7 +3,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { EMPTY, LIFE, PLANT, WATER, applyRule, compile, count, createWorld, moveBody, mulberry32, paint } from '../src/engine/world.ts'
-import { DIVIDE_SIZE, GROW_COST, PLANT_ENERGY, TRAITS, activeMinds, createColony, divideOversized, metabolize, mutate, updateOrganisms } from '../src/engine/organisms.ts'
+import { DIVIDE_SIZE, GROW_COST, PLANT_ENERGY, TRAITS, activeMinds, createColony, divideOversized, kinship, metabolize, mutate, updateOrganisms } from '../src/engine/organisms.ts'
 import { SYSTEM_PROMPT, buildMessages, demoMind, isInvented, parseMindReply } from '../src/engine/mind.ts'
 import { createSim, frame, giveEnergy, think } from '../src/engine/sim.ts'
 
@@ -95,6 +95,26 @@ test('children inherit nature (with a small mutation), story and self-portrait',
   assert.ok(Math.abs(kids[0].energy + kids[1].energy - 100) < 1e-9)
   const m = mutate(p.temperament, mulberry32(1), 0)
   assert.deepEqual(m, p.temperament)
+})
+
+test('siblings know each other: the diary names the sibling, the prompt tags kin and not strangers', () => {
+  const wd = createWorld(40, 40, mulberry32(5))
+  for (let y = 10; y < 20; y++) for (let x = 5; x < 25; x++) wd.cells[y * 40 + x] = LIFE
+  paint(wd, 34, 34, 3, LIFE)
+  const col = createColony()
+  updateOrganisms(wd, col)
+  const stranger = activeMinds(col).find((o) => o.size < DIVIDE_SIZE)!
+  divideOversized(wd, col)
+  updateOrganisms(wd, col)
+  const [a, b] = activeMinds(col).filter((o) => o !== stranger)
+  assert.ok(a.diary.some((d) => d.endsWith(`my sibling: #${b.id}`)))
+  assert.equal(kinship(col, a, b), 'your sibling')
+  assert.equal(kinship(col, a, stranger), '')
+  stranger.fusion = 'refuse'
+  const user = buildMessages(wd, a, [b, stranger], col)[1].content
+  assert.match(user, new RegExp(`#${b.id} \\(\\d+ cells, your sibling[,)]`))
+  assert.match(user, new RegExp(`#${stranger.id} \\(\\d+ cells, refuses fusion\\)`))
+  assert.doesNotMatch(buildMessages(wd, a, [b])[1].content, /sibling\)/, 'no colony, no kinship')
 })
 
 test('energy is given only to a body nearby, never more than half', () => {

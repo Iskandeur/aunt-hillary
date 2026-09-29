@@ -4,7 +4,7 @@
 // The prompt describes the physics and never a strategy: minds find out what works.
 
 import { DIRS, EL_NAMES, EMPTY, GRASS, LIFE, PLANT, WALL, WATER, type Dir, type ElName, type Heading, type Rule, type World } from './world.ts'
-import { DIVIDE_SIZE, MAX_ENERGY_PER_CELL, MIN_SIZE, TRAITS, dedupe, lineage, type Colony, type Organism, type Temperament } from './organisms.ts'
+import { DIVIDE_SIZE, MAX_ENERGY_PER_CELL, MIN_SIZE, TRAITS, dedupe, kinship, lineage, type Colony, type Organism, type Temperament } from './organisms.ts'
 import { COMMON_ENGLISH } from './english.ts'
 
 export const MAX_RULES = 4
@@ -78,9 +78,11 @@ export function energyLine(org: Organism): string {
   return `Energy ${Math.round(org.energy)} (you can hold ${max}).${state}`
 }
 
-export function buildMessages(world: World, org: Organism, neighbors: Organism[]): Array<{ role: string; content: string }> {
+/** Neighbours are shown with their kinship when the colony is known (see kinship in organisms.ts). */
+export function buildMessages(world: World, org: Organism, neighbors: Organism[], colony?: Colony): Array<{ role: string; content: string }> {
   const heard = org.inbox.slice(-4).map((m) => `#${m.from}: "${m.text}"`).join('\n') || '(silence)'
-  const near = neighbors.map((n) => `#${n.id} (${n.size} cells${n.fusion === 'refuse' ? ', refuses fusion' : ''})`).join(', ') || 'none'
+  const tag = (n: Organism) => [colony ? kinship(colony, org, n) : '', n.fusion === 'refuse' ? 'refuses fusion' : ''].filter(Boolean).map((s) => ', ' + s).join('')
+  const near = neighbors.map((n) => `#${n.id} (${n.size} cells${tag(n)})`).join(', ') || 'none'
   const user = [
     `You are #${org.id}, generation ${org.gen}, ${org.size} cells. Time ${world.tick}. ${energyLine(org)}`,
     `Your nature (inherited, not chosen): ${describeTemperament(org.temperament)}.`,

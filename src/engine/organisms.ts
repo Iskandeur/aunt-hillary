@@ -272,10 +272,14 @@ export function updateOrganisms(world: World, colony: Colony, rng: () => number 
       const kids = cs.map((c) => {
         const kid = newOrganism(colony, world.tick, parent, rng)
         kid.energy = (parent.energy * c.cells.length) / total
-        note(kid, world.tick, `I was born when #${parent.id} split in ${cs.length}`)
         label.set(c, kid)
         return kid.id
       })
+      for (const c of cs) {
+        const kid = label.get(c)!
+        const sibs = kids.filter((k) => k !== kid.id).map((k) => '#' + k).join(', ')
+        note(kid, world.tick, `I was born when #${parent.id} split in ${cs.length}; my sibling: ${sibs}`)
+      }
       colony.events.push(`#${parent.id} divided into ${kids.map((k) => '#' + k).join(' + ')}`)
       const heir = [...cs].sort((a, b) => b.cells.length - a.cells.length)[0]
       pushFeed(colony.feed, world.tick, 'divided', label.get(heir)!.id, dividedText(parent.id, kids))
@@ -469,6 +473,17 @@ export function lineage(colony: Colony, id: number): number[] {
     cur = cur.parent != null ? colony.orgs.get(cur.parent) : undefined
   }
   return chain
+}
+
+/** How b is related to a, in the words a mind reads: "your sibling", "your parent", "your child",
+ *  "your kin" (a common ancestor further up), or '' for a stranger. Bodies that split are born side by
+ *  side, so kin start out as neighbours; whether they stay close is up to them. */
+export function kinship(colony: Colony, a: Organism, b: Organism): string {
+  if (a.parent != null && a.parent === b.parent) return 'your sibling'
+  if (a.parent === b.id) return 'your parent'
+  if (b.parent === a.id) return 'your child'
+  const up = new Set(lineage(colony, a.id))
+  return lineage(colony, b.id).some((id) => up.has(id)) ? 'your kin' : ''
 }
 
 /** Largest trait drift from the root of a lineage to this body (0 = same nature as its ancestor). */

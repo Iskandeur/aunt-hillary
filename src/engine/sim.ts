@@ -267,7 +267,7 @@ export function think(sim: Sim, now: number, thinkMs = THINK_MS, gapMs = THOUGHT
   sim.inFlight++
   const ctl = new AbortController()
   const timer = setTimeout(() => ctl.abort(), 30000)
-  llmMind(sim.llm, buildMessages(sim.world, org, neighbors), ctl.signal)
+  llmMind(sim.llm, buildMessages(sim.world, org, neighbors, sim.colony), ctl.signal)
     .then(({ reply, errors, busy }) => {
       if (busy) {
         // Not an error: the endpoint asked us to slow down. Minds wait quietly, nothing is lost.
