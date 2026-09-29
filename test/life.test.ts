@@ -139,6 +139,14 @@ test('only invented words count as language', () => {
   for (const w of ['zuka', 'tosenlu', 'kamiri']) assert.equal(isInvented(w), true, w)
 })
 
+test('isInvented: everyday English with its endings is never an invention (garden season 3: "abundant")', () => {
+  const real = ['abundant', 'abundance', 'abundantly', 'glimmer', 'glimmering', 'thrive', 'thrives', 'thrived', 'thriving',
+    'flickers', 'sunniest', 'happily', 'hopping', 'stopped', 'carries', 'carried', 'nourishing', 'bountiful', 'endless', 'kinship', 'wander', 'wanderers', 'lush', 'lushness']
+  for (const w of real) assert.equal(isInvented(w), false, w)
+  const made = ['zorbu', 'glimmak', 'thrivu', 'kelumi', 'vashti', 'nuzo', 'plorbing', 'zukas']
+  for (const w of made) assert.equal(isInvented(w), true, w)
+})
+
 test('demo minds differ by nature, and the world does not freeze', () => {
   const sim = createSim(7)
   let t = 0

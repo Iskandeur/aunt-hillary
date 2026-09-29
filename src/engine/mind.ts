@@ -190,15 +190,28 @@ export const INITIAL_VOCAB = new Set([...words(SYSTEM_PROMPT), ...EL_NAMES, ...w
   'the and you your are with for not but have this that from what who how why when where can will just all more one two',
 ), ...['food', 'kin', 'water', 'ground', 'void', 'hungry', 'gift']]) // the demo minds' concepts are given too
 
-/** A word nobody gave the minds: absent from their prompt and from everyday English (with its
- *  usual endings: plants, walked, eating…). "south" or "share" are not inventions. */
+const known = (w: string) => w.length >= 3 && (COMMON_ENGLISH.has(w) || INITIAL_VOCAB.has(w))
+const ENDINGS = ['s', 'es', 'ed', 'd', 'ing', 'ly', 'er', 'ers', 'est', 'ness', 'ful', 'less', 'ment', 'ish']
+/** The words a known word could come from once an ending is taken off: glow-ing, glid(e)-ing,
+ *  shimm-er → (none), sunn(y)-est → sunny, hopp-ing → hop, happi-ly → happy. */
+function stems(w: string): string[] {
+  const out: string[] = []
+  for (const suf of ENDINGS) {
+    if (!w.endsWith(suf) || w.length - suf.length < 2) continue
+    const s = w.slice(0, -suf.length)
+    out.push(s, s + 'e')
+    if (s.endsWith('i')) out.push(s.slice(0, -1) + 'y')
+    if (s.length >= 3 && s.at(-1) === s.at(-2)) out.push(s.slice(0, -1))
+  }
+  return out
+}
+
+/** A word nobody gave the minds: absent from their prompt and from everyday English, even with a
+ *  usual ending or two (plants, walked, eating, abundantly, flickering). "south", "share" or
+ *  "abundant" are not inventions. */
 export function isInvented(w: string): boolean {
-  if (INITIAL_VOCAB.has(w) || COMMON_ENGLISH.has(w)) return false
-  for (const suf of ['s', 'es', 'ed', 'd', 'ing', 'ly', 'er', 'ers', 'est', 'ness', 'ful'])
-    if (w.endsWith(suf)) {
-      const stem = w.slice(0, -suf.length)
-      if (stem.length >= 3 && (COMMON_ENGLISH.has(stem) || COMMON_ENGLISH.has(stem + 'e') || INITIAL_VOCAB.has(stem))) return false
-    }
+  if (known(w)) return false
+  for (const s of stems(w)) if (known(s) || stems(s).some(known)) return false
   return true
 }
 
