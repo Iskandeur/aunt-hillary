@@ -69,3 +69,33 @@ without lowering Life, Individuality, Cost or Complexity.
 (children start close to their parent), which is expected. Moments now come every ~12 s at Slow, busier than the 20–30 s target: to watch,
 not yet noise. Still weakest: **Language** (no shared
 invented word yet) and **gifts** (nobody gives energy).
+
+### Season 2 — a tongue nobody was given (pulled out)
+
+**Seen before.** Minds talk, but in plain functional English: *"Plants NW, low energy here"*,
+*"Hello #6, share map data?"*. Nothing in the prompt suggests their words could be their own, so
+nothing is coined and nothing spreads. A second "before" run on the unchanged code also showed how
+noisy one run is: same seed, maximum generation 1 instead of season 1's 4.
+
+**Hypothesis.** If the prompt says no language was given and that they speak only words they made up
+or heard from other bodies, Language rises above zero without lowering Bonds.
+
+**Change.** One line of the system prompt (the `say` action).
+
+| Dimension | Before | After |
+|-----------|--------|-------|
+| Life: mean living bodies · divisions/min · bodies ever | 3.33 · 0.20 · 10 | 3.17 · 0 · 7 |
+| Individuality: distinct "I am" · trait spread | 3.13 · 0.18 | 3.03 · 0.17 |
+| Evolution: max generation · children | 1 · 2 | 0 · 0 |
+| Bonds: fusions · refusals · gifts · replies naming another | 3 · 2 · 0 · 16/75 | 2 · 3 · 0 · 2/75 |
+| Language: invented words said · shared and alive | 3 · 0 | 2 · 0 |
+| Self: continuity · replies about its past | 0.93 · 12/75 | 0.96 · 5/75 |
+| Moments at Slow: seconds between two | 20 | 26 |
+| Cost €/h | 0.38 | 0.39 |
+| Complexity: legend · prompt tokens · actions | 5 · 441 · 8 | 5 · 467 · 8 |
+
+**Verdict.** Pulled out. The minds read "no language was given" as "use only the words you were
+given": they fell back on the prompt's own vocabulary (*"plants south?"*, *"need plants NE"*), half
+the lines went silent, and replies naming a neighbour dropped from 16 to 2. A prohibition shrinks
+speech instead of growing it. Lesson for the next try: coining a word has to *do* something for the
+speaker (a reason, not a rule), or it will not happen.
