@@ -205,3 +205,51 @@ prompt tokens. Bodies still divide, but live divisions stay rare: Evolution is t
 
 *Measurement note: a first pair of before-runs was thrown away. The model provider failed (502/503)
 during them and minds thought 22-30 times instead of 60-70.*
+
+### Season 6 — life grows only onto plants (kept)
+
+**First, a probe that said no.** The best-ranked lead was *a word that serves the one who says it*:
+give the world a place with no English name and see whether a mind coins one when its hungry sibling
+asks where to eat. One decision, real prompt, real model, 20 calls per condition (~0.025 €):
+
+| Condition | New invented word | Reuses the sibling's word "kelu" | Mentions the mark |
+|-----------|------|------|------|
+| Engine as is | 0/20 | 0/20 | 0/20 |
+| A nameless mark "&" next to the plants | 1/20 ("sibs") | — | 0/20 |
+| Same, and the sibling asked "Is there food near the kelu?" | 0/20 | 1/20 | 0/20 |
+
+Nobody even looked at the mark. A landmark only matters to a mind that needs to point at something the
+other cannot see; here the sibling sees the same plants. No season was spent on it.
+
+**So the season took the next lead: remove a concept.** Bodies could grow onto bare ground, grass or
+water at a capped 5% (`MAX_GROW_CHANCE`), and only below 80 cells (`FREE_GROWTH_SIZE`), plus one prompt
+clause to explain it. Two constants and a clause to make matter out of grass. Free bench (6,000 frames,
+3 seeds): without the grass rule bodies split *more* (43-48 vs 35-36) and more of them live (4.7-5.2
+vs 3.7-3.9 on average).
+
+**Hypothesis.** If life grows only onto plants, Complexity drops and nothing else collapses.
+
+**Change.** A rule that turns ground, grass or water into life is refused (*"life grows only onto
+plants"*); both constants and the size filter are gone; the prompt clause becomes shorter.
+
+| Dimension | Before (4242 — 4243) | After (4242 — 4243) |
+|-----------|--------|-------|
+| Life: mean living bodies · divisions/min · starved/min | 3.2 · 0 · 0 — 3.07 · 0 · 0 | 3.27 · 0.39 · 0 — 4.33 · 1.97 · 0.2 |
+| Evolution: max generation · children | 0 · 0 — 0 · 0 | 2 · 4 — 7 · 20 |
+| Individuality: distinct "I am" | 3.1 — 2.93 | 3.0 — 3.87 |
+| Bonds: gifts · replies naming another · recurring pairs | 0 · 10/72 · 4 — 0 · 0/74 · 0 | 0 · 19/75 · 4 — 0 · 14/75 · 3 |
+| Language: invented words said | 0 — 0 | 0 — 0 |
+| Moments at Slow: seconds between | 28 — 18 | 16 — 12 |
+| Cost: prompt tokens in (5 min) | 147k — 143k | 148k — 151k |
+| Complexity: legend · prompt tokens · actions | 5 · 455 · 8 | 5 · 447 · 8 |
+
+**Verdict.** Kept. The removal was meant to cost nothing; it paid instead. Before, 33 of 72 replies
+wrote a grass-to-life rule, and none an eating rule: minds were busy growing slowly on grass, and no
+body reached the size to split. After, not one reply tried free growth (the shorter clause is enough,
+the validator never had to refuse), minds walk more (44 → 67 replies with a move on seed 4242), one
+seed wrote 26 eating rules, and bodies split again: generation 0 → 2 and 0 → 7. Season 5 had left
+live divisions rare; this answers it without touching `MATURE_AGE`.
+
+*Language stays at zero: the "invented" words counted by the ruler are "I'm", "eastward", "westward",
+"beckon", "awoken", "sib". Cost note: the two runs of a pair ran side by side and read the same daily
+counter, so the euro figure each printed is the sum of both; tokens per run are unchanged.*
