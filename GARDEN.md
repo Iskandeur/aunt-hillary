@@ -286,3 +286,35 @@ count as given), *southward*, *westward*, *eastward*, *northwards*, *abound*, *i
 shorter than three letters, and those four rare words. Over the same eight runs, one word survives:
 *oooo*. Language was, and still is, at zero. The dashboard (v3) also counts replies that talk about
 kin: 6/75 and 0/73 before this season.
+
+## Season 8 — hunger narrows sight: pulled out (no gain; the cycle stops)
+
+**Lead.** "A need to talk": information asymmetry. If a hungry body sees less than its full sibling,
+it has something to ask for, and the sibling has something to give.
+
+**Probe first** (`probe-asym.ts` in the garden tools, 75 calls): a full body beside its starving
+sibling. Gifts to the sibling: 1/25 as the game stands, 4/25 when the sibling's hunger is stated,
+9/25 when its sight is also stated as reduced. Invented words: 0/25 everywhere.
+
+**Change tried** (branch `season-8-hungry-sight`, not merged): a hungry or starving body sees 2 cells
+instead of 8, and neighbours see who is hungry.
+
+**Live, 5 min, seeds 4242 / 4243** (before = the season 7 runs, same engine):
+
+| | 4242 before → after | 4243 before → after |
+|---|---|---|
+| Gifts | 0 → **0** | 0 → **0** |
+| Bond edges (mean) | 0.17 → 0.87 | 0 → 0.53 |
+| Replies naming another | 9/75 → 12/75 | 0/73 → 16/75 |
+| Divisions / min | 0.39 → 2.96 | 0 → 0.39 |
+| Max generation | 2 → 5 | 0 → 1 |
+| Tokens in (cost) | 146.9k → 149.8k | 139.7k → 148.5k |
+
+The dimension under test did not move: not one gift in ten minutes of play. Bonds and evolution did
+rise, but that is not what was tested, and a "before" taken four hours earlier is a weak control for
+them. The probe says the model *would* give when the meeting is set up; the live game apparently
+rarely produces that meeting (a full body beside a starving sibling that asks). The next lead is the
+occasion, not the motive: count how often that meeting happens before changing what minds see.
+
+Pulled out: the engine is unchanged. Second season in a row without a gain (7 and 8), so cycle 2
+stops here, as its rule says.
