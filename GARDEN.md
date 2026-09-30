@@ -253,3 +253,36 @@ live divisions rare; this answers it without touching `MATURE_AGE`.
 *Language stays at zero: the "invented" words counted by the ruler are "I'm", "eastward", "westward",
 "beckon", "awoken", "sib". Cost note: the two runs of a pair ran side by side and read the same daily
 counter, so the euro figure each printed is the sum of both; tokens per run are unchanged.*
+
+### Season 7 — less mutation, probed and dropped; the language ruler fixed again (no gain)
+
+**Lead.** Less mutation (`MUTATION` 0.15 → 0.05). In the literature, stable communication between
+agents only appeared with mutation at zero: one mutant breaks a group that depends on shared habits.
+
+**Free test first.** Here a mind never sees its neighbours' nature; the only way mutation reaches
+Bonds is through the words a child reads about its *own* nature. Simulated on 20,000 lineages: at 0.15,
+47% of children read at least one different word for their nature after one division (82% after 7
+generations); at 0.05, 19% (41%). So mutation does change what a mind reads. It is symmetric, though:
+it can only move giving on average if the model reacts to those words.
+
+**Probe** (`probe-mutation.ts`, 60 calls): a full body next to its starving sibling, which asked for
+food. Only the full body's nature changes, shifted *against* giving by the most one mutation can do.
+Worst case on purpose: at 0.15 two words flip, at 0.05 none.
+
+| Nature of the full body | Gives to its sibling | Names it |
+|-------------------------|----------------------|----------|
+| Parent's: frugal (0.28), very sociable (0.72) | 4/20 | 5/20 |
+| One mutation at 0.05: frugal (0.33), very sociable (0.67) | 3/20 | 2/20 |
+| One mutation at 0.15: somewhat greedy (0.43), somewhat sociable (0.57) | 3/20 | 7/20 |
+
+No difference a season could measure. Lowering mutation would mostly slow down what makes lineages
+visibly diverge (Individuality, Evolution) for no gain in Bonds. No season was spent on it; the
+engine is unchanged.
+
+**The ruler, fixed again (free).** Re-reading eight runs from seasons 5 to 7, every "invented" word
+was English: *frugal* (65 times: a word from the minds' own nature line, which the ruler did not
+count as given), *southward*, *westward*, *eastward*, *northwards*, *abound*, *im* (from "I'm"),
+*beckon*, *awoken*, *sib*. `isInvented` now knows the nature words, the endings *-ward(s)*, words
+shorter than three letters, and those four rare words. Over the same eight runs, one word survives:
+*oooo*. Language was, and still is, at zero. The dashboard (v3) also counts replies that talk about
+kin: 6/75 and 0/73 before this season.

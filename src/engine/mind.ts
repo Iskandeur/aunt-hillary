@@ -187,10 +187,13 @@ export function words(text: string): string[] {
 
 export const INITIAL_VOCAB = new Set([...words(SYSTEM_PROMPT), ...EL_NAMES, ...words(
   'the and you your are with for not but have this that from what who how why when where can will just all more one two',
-), ...['food', 'kin', 'water', 'ground', 'void', 'hungry', 'gift']]) // the demo minds' concepts are given too
+), ...['food', 'kin', 'water', 'ground', 'void', 'hungry', 'gift'], // the demo minds' concepts are given too
+...Object.values(TRAIT_WORDS).flat().flatMap(words)]) // and so is their nature: "frugal" was counted 65 times (garden season 7)
 
-const known = (w: string) => w.length >= 3 && (COMMON_ENGLISH.has(w) || INITIAL_VOCAB.has(w))
-const ENDINGS = ['s', 'es', 'ed', 'd', 'ing', 'ly', 'er', 'ers', 'est', 'ness', 'ful', 'less', 'ment', 'ish']
+/** Real English too rare for both frequency lists, said by the minds in the garden (seasons 6-7). */
+const RARE_ENGLISH = new Set(['abound', 'beckon', 'awoken', 'sib', 'sibs'])
+const known = (w: string) => w.length >= 3 && (COMMON_ENGLISH.has(w) || INITIAL_VOCAB.has(w) || RARE_ENGLISH.has(w))
+const ENDINGS = ['s', 'es', 'ed', 'd', 'ing', 'ly', 'er', 'ers', 'est', 'ness', 'ful', 'less', 'ment', 'ish', 'ward', 'wards']
 /** The words a known word could come from once an ending is taken off: glow-ing, glid(e)-ing,
  *  shimm-er → (none), sunn(y)-est → sunny, hopp-ing → hop, happi-ly → happy. */
 function stems(w: string): string[] {
@@ -209,7 +212,7 @@ function stems(w: string): string[] {
  *  usual ending or two (plants, walked, eating, abundantly, flickering). "south", "share" or
  *  "abundant" are not inventions. */
 export function isInvented(w: string): boolean {
-  if (known(w)) return false
+  if (w.length < 3 || known(w)) return false // "i'm" loses its apostrophe and becomes "im"
   for (const s of stems(w)) if (known(s) || stems(s).some(known)) return false
   return true
 }

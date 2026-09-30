@@ -197,6 +197,12 @@ test('isInvented: everyday English with its endings is never an invention (garde
   for (const w of made) assert.equal(isInvented(w), true, w)
 })
 
+test('isInvented: their own nature, directions and contractions are not inventions (garden season 7)', () => {
+  const real = ['frugal', 'incurious', 'solitary', 'reckless', 'southward', 'westward', 'eastward', 'northwards', 'abound', 'beckon', 'awoken', 'sib', 'im']
+  for (const w of real) assert.equal(isInvented(w), false, w)
+  for (const w of ['zukaward', 'kelumi', 'oooo']) assert.equal(isInvented(w), true, w)
+})
+
 test('demo minds differ by nature, and the world does not freeze', () => {
   const sim = createSim(7)
   let t = 0
