@@ -318,3 +318,33 @@ occasion, not the motive: count how often that meeting happens before changing w
 
 Pulled out: the engine is unchanged. Second season in a row without a gain (7 and 8), so cycle 2
 stops here, as its rule says.
+
+## Season 9 — counting the meeting before paying for the motive (no gain, nothing run)
+
+**Question** left by season 8: how often does the live game produce the scene the probes set up, a
+body with energy to spare next to a hungry one?
+
+**Counted for free**, by rereading six stored runs (seasons 6, 7 and 8, 448 thoughts, no model
+call): a thought is an *occasion* if the thinker holds at least half of its reserve and a body it
+lists as near holds a quarter or less of its own (energy taken from the snapshot within 10 s).
+
+| | thoughts | rich | rich with a neighbour | occasions | hungry one spoke | gifts |
+|---|---|---|---|---|---|---|
+| 6 runs, seasons 6-8 | 448 | 284 | 44 | **1** | 0 | 0 |
+
+One occasion in 448 thoughts, with a looser threshold than the engine's own "hungry" (under 0.3
+energy per cell, less than a tenth of the reserve). Neighbours that rich bodies see sit at 0.3-0.97
+of their reserve; the hungry ones are mostly seen by other poor ones. Even at the best probe rate so
+far (9/25), that is about 0.02 gifts per five-minute run: no change to what minds are told could
+show up live.
+
+A probe on the wording of the request (a starving sibling asks for food, or for energy) was written
+and **not launched**: its answer could not change this. Cost of the season: 0 € of play.
+
+**Why the meeting never happens.** At a division, energy is shared in proportion to size, so two
+siblings are born exactly as full as each other; after that they drift apart and eat apart. The one
+place the game puts two related bodies side by side is the one moment they cannot differ.
+
+**Next lead** (season 10): make that moment uneven. The half that keeps the old mind keeps more of
+the energy, the newborn half starts poorer. Every division would then stage the probe's scene by
+itself, beside a sibling, and season 4's probe already measured that scene (starving kin: 4/20).
