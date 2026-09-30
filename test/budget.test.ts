@@ -3,8 +3,8 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { DIVIDE_SIZE, activeMinds, createColony, heirOf, type Organism } from '../src/engine/organisms.ts'
-import { MAX_CHANCE, MAX_GROW_CHANCE, validateRule } from '../src/engine/mind.ts'
-import { FREE_GROWTH_SIZE, createSim, frame, think, THOUGHT_GAP_MS, type Sim } from '../src/engine/sim.ts'
+import { MAX_CHANCE, validateRule } from '../src/engine/mind.ts'
+import { createSim, frame, think, THOUGHT_GAP_MS, type Sim } from '../src/engine/sim.ts'
 import { LIFE, count } from '../src/engine/world.ts'
 
 const REPLY = '{"thought":"hm","say":"lo","rules":[]}'
@@ -102,27 +102,26 @@ test('idle minds do not call the endpoint; physics goes on', async () => {
   }
 })
 
-test('growing into empty space is capped; eating is not', () => {
-  const grow = validateRule({ dir: 'any', neighbor: 'empty', toNeighbor: 'life', chance: 0.5 })
-  const eat = validateRule({ dir: 'any', neighbor: 'plant', toNeighbor: 'life', chance: 0.5 })
-  assert.equal(typeof grow === 'object' && grow.chance, MAX_GROW_CHANCE)
+test('life grows only onto plants: a rule that makes life from ground, grass or water is refused', () => {
+  for (const neighbor of ['empty', 'ground', 'grass', 'water'])
+    assert.match(String(validateRule({ dir: 'any', neighbor, toNeighbor: 'life', chance: 0.5 })), /grows only onto plants/)
+  const eat = validateRule({ dir: 'any', neighbor: 'plant', toNeighbor: 'life', chance: 0.9 })
   assert.equal(typeof eat === 'object' && eat.chance, MAX_CHANCE)
 })
 
-test('greedy bodies cannot fill the world: past FREE_GROWTH_SIZE only eating grows them', () => {
+test('greedy minds cannot fill the world: their free-growth rules never reach the body', () => {
   const sim = createSim(3)
   const greedy = [
-    { self: 'life', dir: 'any', neighbor: 'ground', toSelf: 'life', toNeighbor: 'life', chance: 0.05 },
-    { self: 'life', dir: 'any', neighbor: 'grass', toSelf: 'life', toNeighbor: 'life', chance: 0.5 },
-    { self: 'life', dir: 'any', neighbor: 'water', toSelf: 'life', toNeighbor: 'life', chance: 0.5 },
-  ] as const
+    { dir: 'any', neighbor: 'ground', toNeighbor: 'life', chance: 0.5 },
+    { dir: 'any', neighbor: 'grass', toNeighbor: 'life', chance: 0.5 },
+    { dir: 'any', neighbor: 'plant', toNeighbor: 'life', chance: 0.5 },
+  ].map(validateRule).filter((r) => typeof r === 'object')
+  assert.equal(greedy.length, 1, 'only eating survives validation')
   for (let k = 0; k < 900; k++) {
     for (const o of sim.colony.orgs.values()) if (o.alive) o.rules = greedy.map((r) => ({ ...r }))
     frame(sim)
   }
   const life = count(sim.world, LIFE)
-  const biggest = Math.max(...[...sim.colony.orgs.values()].filter((o) => o.alive).map((o) => o.size))
-  assert.ok(biggest <= DIVIDE_SIZE + FREE_GROWTH_SIZE, `a body reached ${biggest} cells`)
   assert.ok(life < sim.world.cells.length / 3, `${life} life cells out of ${sim.world.cells.length}`)
 })
 

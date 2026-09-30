@@ -93,7 +93,6 @@ test('rules and adopted words read as plain English', () => {
   const eat = { self: 'life' as const, dir: 'any' as const, neighbor: 'plant' as const, toSelf: 'life' as const, toNeighbor: 'life' as const, chance: 0.3 }
   assert.equal(describeRule(eat), 'eat plants touching it (30% per touch)')
   assert.equal(describeRule({ ...eat, dir: 'south', neighbor: 'water', toNeighbor: 'plant', chance: 0.1 }), 'turn water to its south into plant (10% per touch)')
-  assert.match(describeRule({ ...eat, neighbor: 'ground', chance: 0.05 }), /^grow onto bare ground/)
   assert.deepEqual(newRules([eat], [{ ...eat, chance: 0.5 }]), [], 'a chance tweak is not a new rule')
   assert.equal(newRules([], [eat]).length, 1)
   assert.deepEqual(adoptedWords(['kalu'], ['kalu', 'mito', 'zeze'], new Set(['mito'])), ['mito'])

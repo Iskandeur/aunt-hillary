@@ -9,9 +9,6 @@ import { COMMON_ENGLISH } from './english.ts'
 
 export const MAX_RULES = 4
 export const MAX_CHANCE = 0.5
-/** Growing onto anything but food makes matter from little: kept slow, so a body grows fast only
- *  by eating. At 0.5, minds filled half the world in seconds. */
-export const MAX_GROW_CHANCE = 0.05
 const BODY_ELEMENTS: ElName[] = ['ground', 'grass', 'water', 'plant', 'life']
 const HEADINGS: Heading[] = ['north', 'south', 'east', 'west']
 /** Words for the self-portrait. */
@@ -29,8 +26,8 @@ What you can do each time you think:
 - move: walk "north", "south", "east" or "west" (you cannot cross water, rock or other bodies), or null to stay;
 - rules: up to 4 rules for your own cells. A rule rewrites a pair: one of your cells ("self" is always "life")
   and the neighbour cell in direction dir (north, south, east, west, any). If that neighbour is "neighbor",
-  the pair becomes toSelf + toNeighbor with probability chance (max 0.5; making life from ground, grass or
-  water is capped at 0.05). Elements: ground, grass, water, plant, life;
+  the pair becomes toSelf + toNeighbor with probability chance (max 0.5); life grows only onto plants.
+  Elements: ground, grass, water, plant, life;
 - say: one short line, heard only by bodies near you;
 - give: energy to a body near you, {"to":<id>,"amount":<number>};
 - fusion: "accept" or "refuse";
@@ -131,14 +128,14 @@ export function validateRule(raw: unknown): Rule | string {
     if (!BODY_ELEMENTS.includes(v as ElName)) return `bad ${k} ${String(v)}`
   const chance = Number(r.chance ?? 0.1)
   if (!Number.isFinite(chance)) return 'bad chance'
-  const grows = names.toNeighbor === 'life' && names.neighbor !== 'plant' && names.neighbor !== 'life'
+  if (names.toNeighbor === 'life' && names.neighbor !== 'plant' && names.neighbor !== 'life') return `life grows only onto plants, not ${String(names.neighbor)}`
   return {
     self: 'life',
     dir,
     neighbor: names.neighbor as ElName,
     toSelf: names.toSelf as ElName,
     toNeighbor: names.toNeighbor as ElName,
-    chance: Math.min(grows ? MAX_GROW_CHANCE : MAX_CHANCE, Math.max(0, chance)),
+    chance: Math.min(MAX_CHANCE, Math.max(0, chance)),
   }
 }
 

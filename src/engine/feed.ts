@@ -66,7 +66,6 @@ export function describeRule(r: Rule): string {
   const pct = `${Math.round(r.chance * 100)}% per touch`
   let what: string
   if (r.neighbor === 'plant' && r.toNeighbor === 'life') what = `eat plants ${where}`
-  else if (r.neighbor === 'ground' && r.toNeighbor === 'life') what = `grow onto bare ground ${where}`
   else if (r.neighbor === 'life' && r.toNeighbor === 'life' && r.toSelf !== 'life') what = `give its cells to the body ${where}`
   else if (r.neighbor === r.toNeighbor) what = `leave ${r.neighbor} ${where} as it is`
   else what = `turn ${r.neighbor} ${where} into ${r.toNeighbor}`

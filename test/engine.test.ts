@@ -127,8 +127,8 @@ test('parseMindReply extracts fenced JSON and bounds everything', () => {
     '{"self":"wall","dir":"any","neighbor":"plant","toSelf":"life","toNeighbor":"life","chance":0.9},' +
     '{"dir":"sideways","neighbor":"plant","toNeighbor":"life"},' +
     '{"dir":"up","neighbor":"empty","toNeighbor":"wall"},' +
-    '{"dir":"up","neighbor":"empty","toNeighbor":"life"},{"dir":"up","neighbor":"empty","toNeighbor":"life"},' +
-    '{"dir":"up","neighbor":"empty","toNeighbor":"life"},{"dir":"up","neighbor":"empty","toNeighbor":"life"}]}\n```'
+    '{"dir":"up","neighbor":"grass","toNeighbor":"plant"},{"dir":"up","neighbor":"grass","toNeighbor":"plant"},' +
+    '{"dir":"up","neighbor":"grass","toNeighbor":"plant"},{"dir":"up","neighbor":"grass","toNeighbor":"plant"}]}\n```'
   const { reply, errors } = parseMindReply(text)
   assert.ok(reply)
   assert.equal(reply.rules.length, 4)

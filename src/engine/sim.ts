@@ -85,10 +85,6 @@ export function setRules(sim: Sim, rules: Rule[]): void {
   sim.compiled = rules.map(compile)
 }
 
-/** Above this size a body grows only by eating plants: its rules that turn anything else into life
- *  are set aside. LLM minds that grew freely filled the world with two giant bodies. */
-export const FREE_GROWTH_SIZE = 80
-const makesLifeFromNonFood = (r: Rule) => r.toNeighbor === 'life' && r.neighbor !== 'plant' && r.neighbor !== 'life'
 /** Bodies walk every MOVE_EVERY frames, a few cells at a time. */
 export const MOVE_EVERY = 2
 /** When fewer bodies than this are alive, new life stirs by a lake now and then. */
@@ -135,8 +131,7 @@ export function frame(sim: Sim): void {
   const orgRules = new Map<number, CRule[]>()
   for (const o of sim.colony.orgs.values()) {
     if (!o.alive || !o.rules.length) continue
-    const rules = o.size >= FREE_GROWTH_SIZE ? o.rules.filter((r) => !makesLifeFromNonFood(r)) : o.rules
-    if (rules.length) orgRules.set(o.id, rules.map(compile))
+    orgRules.set(o.id, o.rules.map(compile))
   }
   step(sim.world, sim.compiled, orgRules, ledgerOf(sim.colony, sim.world.tick))
   if (sim.world.tick % MOVE_EVERY === 0)
