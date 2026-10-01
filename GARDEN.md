@@ -348,3 +348,33 @@ place the game puts two related bodies side by side is the one moment they canno
 **Next lead** (season 10): make that moment uneven. The half that keeps the old mind keeps more of
 the energy, the newborn half starts poorer. Every division would then stage the probe's scene by
 itself, beside a sibling, and season 4's probe already measured that scene (starving kin: 4/20).
+
+## Season 10 — an uneven split, benched and dropped (no gain, nothing run; the cycle stops)
+
+**Hypothesis** (season 9's lead): if the larger half of a division (the heir, the one a thought in
+flight goes to) keeps most of the parent's energy and the smaller half starts poor, every division
+stages the giving scene by itself, beside a sibling.
+
+**Bench, no model** (the engine untouched, energy reshared right after each division; demo minds so
+bodies walk apart as they do live; the "eat" rule imposed as in the season 5 bench; 4 seeds × 6 000
+frames, 296 thoughts per arm; occasions counted as in season 9):
+
+| heir's share | divisions | occasions | of which a sibling | starved | newborn halves starved |
+|---|---|---|---|---|---|
+| by size (now) | 142 | 5 | 1 | 50 | 25 / 142 |
+| 65 % | 136 | 5 | 1 | 53 | 33 / 138 |
+| 75 % | 130 | 18 | 13 | 49 | 35 / 134 |
+| 85 % | 135 | 39 | 23 | 67 | 45 / 136 |
+
+The bench is calibrated: by size, it gives 0.035 occasions per division; the six live runs reread in
+season 9 gave 1 in about 30 divisions (0.033). Live runs divide about five times in five minutes, so
+an 85/15 split would bring **about one occasion per run** (0.5 at 75/25). At the best rate measured for
+a starving sibling (4/20), that is 0.1 to 0.25 gifts per run: four paid runs could not tell it from
+zero. And it costs lives: a third of the poor newborns starve at 85/15, against a sixth now.
+
+**Not run, not kept.** Cost: 0 € of play.
+
+**What the bench says about gifts.** The occasion is bounded by the number of divisions, and divisions
+are rare live; even a scene staged at every birth stays under one per run. No more gift seasons while
+live runs divide only a handful of times. Two seasons in a row without gain (9 and 10): cycle 3 stops
+here, cycle 4 starts at season 11.
