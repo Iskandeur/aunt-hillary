@@ -378,3 +378,24 @@ zero. And it costs lives: a third of the poor newborns starve at 85/15, against 
 are rare live; even a scene staged at every birth stays under one per run. No more gift seasons while
 live runs divide only a handful of times. Two seasons in a row without gain (9 and 10): cycle 3 stops
 here, cycle 4 starts at season 11.
+
+## Season 11 — a need to talk, probed and dropped (no gain, nothing run)
+
+**Hypothesis** (cycle 4, lead 1): if a full body and a starving sibling do not see the same things,
+they will need to talk, and words (or invented words) will carry the difference.
+
+**Probe** (`probe-asym.ts`, 25 vignettes per arm, live model):
+
+| arm | gives | invented words | directions given |
+|---|---|---|---|
+| now | 1/25 | 0/25 | 6/25 |
+| hunger visible | 5/25 | 0/25 | 4/25 |
+| hunger visible + sight reduced | 6/25 | 0/25 | 4/25 |
+
+No invented word in any arm, and fewer directions, not more: the asymmetry does not make them speak.
+Giving rises in the vignette, but seasons 9 and 10 showed the live game almost never stages that
+scene, so four paid runs would very likely read zero again. **Not run, not kept.** Cost: 0.031 € of
+probe (75 calls), 0 € of play.
+
+**Cadence.** Five seasons in a row have kept nothing (7 to 11). As the frugal regime says, the garden
+now gets one season every three days.
