@@ -34,7 +34,7 @@ What you can do each time you think:
 - remember: one short note to keep;
 - self: who you are, in your own words, starting with "I am".
 Reply with JSON only:
-{"thought":"<=20 words","self":"I am ... (<=25 words)","say":"<=12 words","remember":"<=15 words","move":null,"fusion":"accept","give":null,"rules":[]}`
+{"thought":"<=20 words","self":"I am ... (<=25 words)","say":"<=12 words","remember":"<=15 words","move":null,"fusion":"accept","give":null,"rules":[{"self":"life","dir":"any","neighbor":"plant","toSelf":"life","toNeighbor":"life","chance":0.2}]}`
 
 const GLYPH: Record<number, string> = { [EMPTY]: ' ', [WALL]: '#', [GRASS]: ',', [WATER]: '~', [PLANT]: '*' }
 
