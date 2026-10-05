@@ -399,3 +399,59 @@ probe (75 calls), 0 € of play.
 
 **Cadence.** Five seasons in a row have kept nothing (7 to 11). As the frugal regime says, the garden
 now gets one season every three days.
+
+## Season 12 — an eating rule in the reply template: divisions up, every mind copies it (pulled out; the cycle stops)
+
+**Seen first, at no cost** (`size-scan.ts` over the six saved runs of the current engine, seasons 6 to 8):
+live divisions follow the eating rules the minds write. Runs where no reply writes one (0/75, 0/73)
+divide 0 to 2 times; runs where 19 to 28 replies out of 75 write one divide 2 to 15 times. In four runs
+out of six no body ever reaches 90 cells, and those near it sit on a full store (74 to 90 %): rich and
+idle, not held back by the maturity wait. So lowering `MATURE_AGE`, the lever season 5 had set aside,
+would change nothing where divisions are missing.
+
+**Hypothesis:** if the reply template shows one eating rule instead of an empty list, minds write
+eating rules, bodies grow and divide (Evolution), and nothing else collapses.
+
+**Probe** (`probe-eat.ts`, a fed body with no rules and 37 plant cells in view, 20 replies per arm):
+
+| arm | writes an eating rule | writes any rule | distinct "I am" |
+|---|---|---|---|
+| template as now (`"rules":[]`) | 0/20 | 0/20 | 20 |
+| one sentence: "that is eating, and the only way to grow" | 0/20 | 1/20 | 20 |
+| template shows an eating rule | 12/20 | 12/20 | 20 |
+
+**Two paid runs after** (seeds 4242 and 4243), against the four saved runs of the same engine:
+
+| | before (4 runs) | after 4242 | after 4243 |
+|---|---|---|---|
+| divisions in 5 min | 0 · 2 · 2 · 10 | 39 | 39 |
+| deepest generation | 0 · 2 · 2 · 7 | 8 | 11 |
+| living bodies (mean) | 3.0 to 4.3 | 7.1 | 5.8 |
+| starved per minute | 0 to 0.2 | 3.75 | 2.96 |
+| replies naming another `#id` | 0 to 19 / 75 | 27/75 | 34/75 |
+| replies with a rule | 0 · 0 · 5 · 26 / 75 | 74/75 | 75/75 |
+| distinct rule shapes | 0 · 0 · 2 · 2 | 1 | 1 |
+| exact copies of the template | 0 | 74/74 | 53/75 |
+| a nameable moment at Slow speed, every | 12 to 17 s | 5 s | 6 s |
+| € per hour | ~0.37 | 0.41 | 0.41 |
+
+The population booms and then starves (living cells 1 140 at the peak, about 250 at the end, two to
+four bodies left), in line with the "everyone eats" regime the season 5 and 6 benches had already
+judged sound (43 to 48 divisions), far from the season 4 runaway (560).
+
+**Pulled out**, on a judgment call that is worth stating plainly. Evolution, Individuality and Bonds all
+rise. But the rise is dictated: nearly every reply writes the template's rule, often to the digit.
+Rule variety was already poor before (0 to 2 shapes per run; the ten shapes of season 8, including
+minds that sowed plants onto grass, came from another engine), so variety does not fall far. What does
+go is the choice: before, some lineages ate and others did not, and the ones that ate were the ones
+that divided. That difference is the only selection on rules this world has, and a template that
+everyone copies removes it. On top of that, starvation rises fifteenfold, and at Slow speed something
+happens every 5 to 6 s, against a target of 20 to 30 (12 to 17 before): noise, not moments. The branch is kept
+(`season-12-eat-example`) in case the trade looks different later.
+
+A last probe showed the *shape* of a rule with blanks instead of values (`"dir":"<dir>"`…): 1/20
+eating rules, 3/20 rules at all. Showing the form is not enough; giving the content takes the choice away.
+
+**Lesson for the next cycle:** the lever is not knowing *how* to eat, it is learning *that it pays*.
+Minds never hear what their rules did. Cost: 0.10 € (95 probe calls, 2 runs). Two seasons in a row
+without gain (11 and 12): cycle 4 stops, cycle 5 starts at season 13.
