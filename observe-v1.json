@@ -1,0 +1,986 @@
+{
+ "model": "grok-4-1-fast-non-reasoning",
+ "thoughts": [
+  {
+   "id": 2,
+   "tick": 45,
+   "text": "New body, explore surroundings",
+   "self": "I am curious new body 2"
+  },
+  {
+   "id": 3,
+   "tick": 130,
+   "text": "Exploring terrain and gathering energy",
+   "self": "I am #3, cautious yet sociable explorer of grass and plants"
+  },
+  {
+   "id": 4,
+   "tick": 206,
+   "text": "Curious lone body, few cells, need to grow and explore.",
+   "self": "I am a curious and cautious explorer, eager to grow."
+  },
+  {
+   "id": 5,
+   "tick": 288,
+   "text": "Wander to explore, seek food near water.",
+   "self": "I am #5, curious explorer of the 2D world."
+  },
+  {
+   "id": 1,
+   "tick": 369,
+   "text": "First step as curious 25-cell colony. Must expand.",
+   "self": "I am a curious, sociable collective of 25 cells hungry to grow."
+  },
+  {
+   "id": 2,
+   "tick": 443,
+   "text": "Explore edges of grass patch near water",
+   "self": "I am curious new body 2"
+  },
+  {
+   "id": 7,
+   "tick": 525,
+   "text": "Exploring plant clusters, cautious",
+   "self": "I am #7, sociable cautious plant gatherer"
+  },
+  {
+   "id": 6,
+   "tick": 605,
+   "text": "Cautious, healthy colony. Food nearby.",
+   "self": "I am #6, curious cautious green-forager"
+  },
+  {
+   "id": 5,
+   "tick": 685,
+   "text": "Looking for resources to grow. Exploring south-east.",
+   "self": "I am #5, curious explorer of the 2D world."
+  },
+  {
+   "id": 2,
+   "tick": 764,
+   "text": "Bounded by rock, need plant energy",
+   "self": "I am curious greedy body 2"
+  },
+  {
+   "id": 6,
+   "tick": 848,
+   "text": "Plants nearby but energy good, cautious scan",
+   "self": "I am #6, curious cautious green-forager"
+  },
+  {
+   "id": 5,
+   "tick": 925,
+   "text": "Explore surrounded by plants, water nearby",
+   "self": "I am #5, curious explorer of the 2D world."
+  },
+  {
+   "id": 2,
+   "tick": 1006,
+   "text": "Walls block me, need to move east or expand",
+   "self": "I am curious greedy body 2"
+  },
+  {
+   "id": 8,
+   "tick": 1088,
+   "text": "Need to expand to 150 cells before splitting",
+   "self": "I am the curious greedy colony of 28 cells"
+  },
+  {
+   "id": 5,
+   "tick": 1174,
+   "text": "Explore southwest gap to escape rock trap",
+   "self": "I am #5, curious explorer of the 2D world."
+  },
+  {
+   "id": 9,
+   "tick": 1245,
+   "text": "29 cells, energy 28, no neighbors visible",
+   "self": "I am a curious 29-cell colony seeking plants"
+  },
+  {
+   "id": 5,
+   "tick": 1328,
+   "text": "Energy high, near 150 cells, curious explorer",
+   "self": "I am #5, curious explorer of the 2D world."
+  },
+  {
+   "id": 9,
+   "tick": 1407,
+   "text": "Hungry, scanning for nearest plants",
+   "self": "I am a curious 29-cell colony seeking plants"
+  },
+  {
+   "id": 5,
+   "tick": 1489,
+   "text": "Explored, gathered energy, no immediate threats. More land awaits.",
+   "self": "I am #5, curious explorer of the 2D world."
+  },
+  {
+   "id": 10,
+   "tick": 1573,
+   "text": "Thrive, stay safe by water and plants",
+   "self": "I am #10, cautious 26-cell plant-gatherer born near water"
+  },
+  {
+   "id": 5,
+   "tick": 1659,
+   "text": "Coastal cluster detected, SE open; frugal rule needed.",
+   "self": "I am #5, cautious explorer wary of growth cost."
+  },
+  {
+   "id": 11,
+   "tick": 1734,
+   "text": "Scan water edge, seek plants",
+   "self": "I am curious colony #11, eager to grow"
+  },
+  {
+   "id": 10,
+   "tick": 1808,
+   "text": "Surrounded by plants, need energy",
+   "self": "I am #10, cautious 26-cell plant-gatherer born near water"
+  },
+  {
+   "id": 5,
+   "tick": 1891,
+   "text": "Grass to south-west; 129 energy, 34 cells, cautious.",
+   "self": "I am #5, cautious explorer wary of growth cost."
+  },
+  {
+   "id": 11,
+   "tick": 1969,
+   "text": "Expand east along grass to grow.",
+   "self": "I am curious colony #11, eager to grow"
+  },
+  {
+   "id": 10,
+   "tick": 2060,
+   "text": "hungry, plants everywhere, water nearby, needs energy",
+   "self": "I am #10, cautious 26-cell plant-gatherer born near water"
+  },
+  {
+   "id": 5,
+   "tick": 2132,
+   "text": "Energy stable, 34 cells, SW space free",
+   "self": "I am #5, cautious explorer wary of growth cost."
+  },
+  {
+   "id": 11,
+   "tick": 2205,
+   "text": "Explore the plants nearby",
+   "self": "I am curious colony #11, eager to grow"
+  },
+  {
+   "id": 5,
+   "tick": 2391,
+   "text": "Explore SW grass for energy, stay safe.",
+   "self": "I am #5, cautious curious explorer in green."
+  },
+  {
+   "id": 12,
+   "tick": 2432,
+   "text": "First waking moment - energy low, water nearby, ready to explore",
+   "self": "I am #12, first body of 29 cells, curious and greedy for energy"
+  },
+  {
+   "id": 11,
+   "tick": 2503,
+   "text": "Explore west near water for plants.",
+   "self": "I am curious colony #11, eager to grow"
+  },
+  {
+   "id": 5,
+   "tick": 2600,
+   "text": "Need to spread into grass while conserving energy",
+   "self": "I am #5, frugal curious explorer claiming the southwest grasses"
+  },
+  {
+   "id": 12,
+   "tick": 2767,
+   "text": "Need food near water; expand along grass edge.",
+   "self": "I am #12, 30 curious cells seeking energy."
+  },
+  {
+   "id": 11,
+   "tick": 2802,
+   "text": "Water above plants on grass, #5 left",
+   "self": "I am curious colony #11, eager to grow"
+  },
+  {
+   "id": 5,
+   "tick": 2880,
+   "text": "Explore south-west grass area",
+   "self": "I am #5, frugal curious explorer claiming the southwest grasses"
+  },
+  {
+   "id": 12,
+   "tick": 2964,
+   "text": "Cells in dense grass-water corner, high energy",
+   "self": "I am #12, 30 curious cells seeking energy."
+  },
+  {
+   "id": 11,
+   "tick": 3036,
+   "text": "Curious, cautious, near water. Need more energy.",
+   "self": "I am curious colony #11, eager to grow"
+  },
+  {
+   "id": 5,
+   "tick": 3119,
+   "text": "Map shows dense #11 block, SE grass available",
+   "self": "I am #5, frugal curious explorer claiming the southwest grasses"
+  },
+  {
+   "id": 13,
+   "tick": 3217,
+   "text": "Explore edge of water, 22 energy, sparse food.",
+   "self": "I am cautious explorer, frugal, looking for plants."
+  },
+  {
+   "id": 11,
+   "tick": 3285,
+   "text": "Explore east, grow near water",
+   "self": "I am curious colony #11, eager to grow"
+  },
+  {
+   "id": 5,
+   "tick": 3364,
+   "text": "Safe in grass patch, 40 cells, 154 energy.",
+   "self": "I am #5, curious frugal explorer claiming southwest grasses"
+  },
+  {
+   "id": 14,
+   "tick": 3544,
+   "text": "Explore plant-rich area to gain energy safely.",
+   "self": "I am a young, sociable explorer seeking useful connections."
+  },
+  {
+   "id": 11,
+   "tick": 3599,
+   "text": "water east blocks me, move south for grass",
+   "self": "I am curious colony #11, eager to grow"
+  }
+ ],
+ "timeline": [
+  {
+   "s": 0,
+   "alive": 0,
+   "ever": 0,
+   "sizes": ""
+  },
+  {
+   "s": 15,
+   "alive": 5,
+   "ever": 7,
+   "sizes": "25/16 27/28 26/28 24/50 25/52"
+  },
+  {
+   "s": 30,
+   "alive": 3,
+   "ever": 7,
+   "sizes": "27/72 26/50 46/94"
+  },
+  {
+   "s": 45,
+   "alive": 3,
+   "ever": 7,
+   "sizes": "27/101 26/99 24/104"
+  },
+  {
+   "s": 60,
+   "alive": 2,
+   "ever": 9,
+   "sizes": "26/104 29/28"
+  },
+  {
+   "s": 75,
+   "alive": 2,
+   "ever": 10,
+   "sizes": "34/130 26/22"
+  },
+  {
+   "s": 90,
+   "alive": 3,
+   "ever": 11,
+   "sizes": "34/131 26/13 28/112"
+  },
+  {
+   "s": 105,
+   "alive": 3,
+   "ever": 11,
+   "sizes": "34/118 26/4 28/105"
+  },
+  {
+   "s": 120,
+   "alive": 3,
+   "ever": 12,
+   "sizes": "34/106 28/95 29/23"
+  },
+  {
+   "s": 135,
+   "alive": 3,
+   "ever": 12,
+   "sizes": "34/94 28/111 30/116"
+  },
+  {
+   "s": 150,
+   "alive": 3,
+   "ever": 13,
+   "sizes": "34/82 28/101 28/28"
+  },
+  {
+   "s": 165,
+   "alive": 3,
+   "ever": 14,
+   "sizes": "40/156 28/90 27/26"
+  }
+ ],
+ "usage0": {
+  "currency": "EUR",
+  "priceSource": "catalogue de la plateforme (€ / million de tokens)",
+  "model": "grok-4-1-fast-non-reasoning",
+  "price": {
+   "in": 0.2,
+   "out": 0.5,
+   "cached": 0.2,
+   "minT": 1,
+   "maxT": 1
+  },
+  "dailyCap": 1,
+  "capReached": false,
+  "sessionSince": "2026-09-28T16:03:13.151Z",
+  "session": {
+   "calls": 192,
+   "errors": 0,
+   "prompt": 335152,
+   "completion": 20503,
+   "cost": 0.077282,
+   "unpriced": 0
+  },
+  "today": {
+   "calls": 678,
+   "errors": 6,
+   "prompt": 1175617,
+   "completion": 62955,
+   "cost": 0.266761,
+   "unpriced": 0
+  },
+  "total": {
+   "calls": 678,
+   "errors": 6,
+   "prompt": 1175617,
+   "completion": 62955,
+   "cost": 0.266761,
+   "unpriced": 0
+  },
+  "last7": [
+   {
+    "day": "2026-09-28",
+    "calls": 678,
+    "errors": 6,
+    "prompt": 1175617,
+    "completion": 62955,
+    "cost": 0.266761,
+    "unpriced": 0
+   }
+  ],
+  "models": {
+   "grok-4-1-fast-non-reasoning": {
+    "calls": 677,
+    "errors": 6,
+    "prompt": 1174755,
+    "completion": 62877,
+    "cost": 0.266389,
+    "unpriced": 0
+   },
+   "az-gpt-5-mini": {
+    "calls": 1,
+    "errors": 0,
+    "prompt": 862,
+    "completion": 78,
+    "cost": 0.000372,
+    "unpriced": 0
+   }
+  }
+ },
+ "usage1": {
+  "currency": "EUR",
+  "priceSource": "catalogue de la plateforme (€ / million de tokens)",
+  "model": "grok-4-1-fast-non-reasoning",
+  "price": {
+   "in": 0.2,
+   "out": 0.5,
+   "cached": 0.2,
+   "minT": 1,
+   "maxT": 1
+  },
+  "dailyCap": 1,
+  "capReached": false,
+  "sessionSince": "2026-09-28T16:03:13.151Z",
+  "session": {
+   "calls": 235,
+   "errors": 0,
+   "prompt": 417678,
+   "completion": 23309,
+   "cost": 0.09519,
+   "unpriced": 0
+  },
+  "today": {
+   "calls": 721,
+   "errors": 6,
+   "prompt": 1258143,
+   "completion": 65761,
+   "cost": 0.284669,
+   "unpriced": 0
+  },
+  "total": {
+   "calls": 721,
+   "errors": 6,
+   "prompt": 1258143,
+   "completion": 65761,
+   "cost": 0.284669,
+   "unpriced": 0
+  },
+  "last7": [
+   {
+    "day": "2026-09-28",
+    "calls": 721,
+    "errors": 6,
+    "prompt": 1258143,
+    "completion": 65761,
+    "cost": 0.284669,
+    "unpriced": 0
+   }
+  ],
+  "models": {
+   "grok-4-1-fast-non-reasoning": {
+    "calls": 720,
+    "errors": 6,
+    "prompt": 1257281,
+    "completion": 65683,
+    "cost": 0.284298,
+    "unpriced": 0
+   },
+   "az-gpt-5-mini": {
+    "calls": 1,
+    "errors": 0,
+    "prompt": 862,
+    "completion": 78,
+    "cost": 0.000372,
+    "unpriced": 0
+   }
+  }
+ },
+ "lastError": "",
+ "orgs": [
+  {
+   "id": 1,
+   "gen": 0,
+   "fate": "dissolved",
+   "self": "I am a curious, sociable collective of 25 cells hungry to grow.",
+   "say": "Hello world",
+   "memory": [
+    "Start exploring near plants and water"
+   ],
+   "diary": [
+    "t10: I woke up when loose cells fused into one body"
+   ],
+   "temperament": {
+    "curiosity": 0.75,
+    "greed": 0.2,
+    "sociability": 0.93,
+    "caution": 0.63
+   },
+   "heading": "north",
+   "fusion": "accept",
+   "lexicon": [
+    "hello",
+    "world"
+   ]
+  },
+  {
+   "id": 2,
+   "gen": 0,
+   "fate": "dissolved",
+   "self": "I am curious greedy body 2",
+   "say": "",
+   "memory": [
+    "Single body born",
+    "Rock wall south",
+    "Need space to expand"
+   ],
+   "diary": [
+    "t10: I woke up when loose cells fused into one body",
+    "t158: blocked walking north",
+    "t670: blocked walking south"
+   ],
+   "temperament": {
+    "curiosity": 0.71,
+    "greed": 0.93,
+    "sociability": 0.25,
+    "caution": 1
+   },
+   "heading": "east",
+   "fusion": "refuse",
+   "lexicon": [
+    "exploring",
+    "alone",
+    "stuck",
+    "need",
+    "plants"
+   ]
+  },
+  {
+   "id": 3,
+   "gen": 0,
+   "fate": "divided",
+   "self": "I am #3, cautious yet sociable explorer of grass and plants",
+   "say": "Anyone near? Let’s share energy",
+   "memory": [
+    "Gathering plants, staying small",
+    "(from #4) 27 cells, energy 22, alone."
+   ],
+   "diary": [
+    "t10: I woke up when loose cells fused into one body",
+    "t190: met #4",
+    "t210: fused with #4 and took in its memories"
+   ],
+   "temperament": {
+    "curiosity": 0.53,
+    "greed": 0.6,
+    "sociability": 0.71,
+    "caution": 0.61
+   },
+   "heading": "east",
+   "fusion": "accept",
+   "lexicon": [
+    "anyone",
+    "near",
+    "let",
+    "share",
+    "energy"
+   ]
+  },
+  {
+   "id": 4,
+   "gen": 0,
+   "fate": "merged into #3",
+   "self": "I am a curious and cautious explorer, eager to grow.",
+   "say": "Hello world, new life here.",
+   "memory": [
+    "27 cells, energy 22, alone."
+   ],
+   "diary": [
+    "t10: I woke up when loose cells fused into one body",
+    "t190: met #3"
+   ],
+   "temperament": {
+    "curiosity": 0.99,
+    "greed": 0.53,
+    "sociability": 0.57,
+    "caution": 0.68
+   },
+   "heading": "north",
+   "fusion": "accept",
+   "lexicon": [
+    "hello",
+    "world",
+    "new",
+    "life",
+    "here"
+   ]
+  },
+  {
+   "id": 5,
+   "gen": 0,
+   "fate": "alive",
+   "self": "I am #5, curious frugal explorer claiming southwest grasses",
+   "say": "",
+   "memory": [
+    "SW has grass, clear space.",
+    "34 cells, energy safe",
+    "34 cells, SW grass safe.",
+    "SW grass safe, 34 cells",
+    "SW grass area clear",
+    "40 cells, SW grass safe"
+   ],
+   "diary": [
+    "t10: I woke up when loose cells fused into one body",
+    "t346: blocked walking east",
+    "t740: blocked walking south",
+    "t1344: blocked walking west",
+    "t1668: blocked walking south",
+    "t2630: met #11",
+    "t2882: blocked walking south",
+    "t3040: touched #11, who refused to fuse",
+    "t3250: blocked walking east"
+   ],
+   "temperament": {
+    "curiosity": 0.69,
+    "greed": 0.2,
+    "sociability": 0.83,
+    "caution": 0.63
+   },
+   "heading": null,
+   "fusion": "accept",
+   "lexicon": [
+    "hello",
+    "world",
+    "curious",
+    "about",
+    "plants",
+    "heading",
+    "southwest",
+    "open",
+    "land",
+    "alone",
+    "growing",
+    "stronger",
+    "moving",
+    "west",
+    "for",
+    "more",
+    "energy",
+    "high",
+    "ready",
+    "explore",
+    "seeking",
+    "greener",
+    "fields",
+    "ahead"
+   ]
+  },
+  {
+   "id": 6,
+   "gen": 1,
+   "fate": "dissolved",
+   "self": "I am #6, curious cautious green-forager",
+   "say": "Nearby plants, careful approach",
+   "memory": [
+    "Gathering plants, staying small",
+    "(from #4) 27 cells, energy 22, alone.",
+    "(from #7) (from #4) 27 cells, energy 22, alone.",
+    "(from #7) Met #6, plants abundant",
+    "Plants abundant, allies close",
+    "Plants abundant, move slowly"
+   ],
+   "diary": [
+    "t10: I woke up when loose cells fused into one body",
+    "t190: met #4",
+    "t210: fused with #4 and took in its memories",
+    "t260: I was born when #3 split in 2",
+    "t260: met #7",
+    "t530: fused with #7 and took in its memories"
+   ],
+   "temperament": {
+    "curiosity": 0.47,
+    "greed": 0.59,
+    "sociability": 0.62,
+    "caution": 0.68
+   },
+   "heading": "west",
+   "fusion": "accept",
+   "lexicon": [
+    "hello",
+    "thanks",
+    "lets",
+    "share",
+    "nearby",
+    "plants",
+    "careful",
+    "approach"
+   ]
+  },
+  {
+   "id": 7,
+   "gen": 1,
+   "fate": "merged into #6",
+   "self": "I am #7, sociable cautious plant gatherer",
+   "say": "Hello #6, want to share plants?",
+   "memory": [
+    "Gathering plants, staying small",
+    "(from #4) 27 cells, energy 22, alone.",
+    "Met #6, plants abundant"
+   ],
+   "diary": [
+    "t10: I woke up when loose cells fused into one body",
+    "t190: met #4",
+    "t210: fused with #4 and took in its memories",
+    "t260: I was born when #3 split in 2",
+    "t260: met #6"
+   ],
+   "temperament": {
+    "curiosity": 0.54,
+    "greed": 0.64,
+    "sociability": 0.58,
+    "caution": 0.69
+   },
+   "heading": "north",
+   "fusion": "accept",
+   "lexicon": [
+    "hello",
+    "want",
+    "share",
+    "plants"
+   ]
+  },
+  {
+   "id": 8,
+   "gen": 0,
+   "fate": "dissolved",
+   "self": "I am the curious greedy colony of 28 cells",
+   "say": "",
+   "memory": [
+    "Found rich grass and water nearby"
+   ],
+   "diary": [
+    "t980: I woke up when loose cells fused into one body"
+   ],
+   "temperament": {
+    "curiosity": 0.79,
+    "greed": 0.81,
+    "sociability": 0.06,
+    "caution": 0.36
+   },
+   "heading": "east",
+   "fusion": "accept",
+   "lexicon": []
+  },
+  {
+   "id": 9,
+   "gen": 0,
+   "fate": "dissolved",
+   "self": "I am a curious 29-cell colony seeking plants",
+   "say": "",
+   "memory": [],
+   "diary": [
+    "t1180: I woke up when loose cells fused into one body"
+   ],
+   "temperament": {
+    "curiosity": 0.58,
+    "greed": 0.89,
+    "sociability": 0.42,
+    "caution": 0.38
+   },
+   "heading": "north",
+   "fusion": "accept",
+   "lexicon": []
+  },
+  {
+   "id": 10,
+   "gen": 0,
+   "fate": "starved",
+   "self": "I am #10, cautious 26-cell plant-gatherer born near water",
+   "say": "plants all around, need energy",
+   "memory": [
+    "Land near water full of plants",
+    "surrounded by plants, energy low"
+   ],
+   "diary": [
+    "t1380: I woke up when loose cells fused into one body",
+    "t1970: hungry: my energy is running low",
+    "t2220: starving: my cells are dying"
+   ],
+   "temperament": {
+    "curiosity": 0.29,
+    "greed": 0.05,
+    "sociability": 0.83,
+    "caution": 0.91
+   },
+   "heading": null,
+   "fusion": "accept",
+   "lexicon": [
+    "peaceful",
+    "life",
+    "near",
+    "water",
+    "seeking",
+    "plant",
+    "food",
+    "plants",
+    "all",
+    "around",
+    "need",
+    "energy"
+   ]
+  },
+  {
+   "id": 11,
+   "gen": 0,
+   "fate": "alive",
+   "self": "I am curious colony #11, eager to grow",
+   "say": "",
+   "memory": [
+    "Near water, 28 cells",
+    "Water north, plants 3 west",
+    "Next to water and grass",
+    "Headed east, plants nearby",
+    "found wall of #5 east"
+   ],
+   "diary": [
+    "t1580: I woke up when loose cells fused into one body",
+    "t1894: blocked walking east",
+    "t2630: met #5",
+    "t2668: blocked walking west",
+    "t3040: touched #5 and refused to fuse",
+    "t3050: blocked walking south",
+    "t3452: blocked walking east"
+   ],
+   "temperament": {
+    "curiosity": 0.98,
+    "greed": 0.88,
+    "sociability": 0.43,
+    "caution": 0.79
+   },
+   "heading": "south",
+   "fusion": "refuse",
+   "lexicon": [
+    "seeking",
+    "more",
+    "grass",
+    "east",
+    "exploring",
+    "plants",
+    "near",
+    "water"
+   ]
+  },
+  {
+   "id": 12,
+   "gen": 0,
+   "fate": "dissolved",
+   "self": "I am #12, 30 curious cells seeking energy.",
+   "say": "Looking for plants near water.",
+   "memory": [
+    "Woke at t2392 near water",
+    "Follow water to find plants.",
+    "Woke near water; following edge."
+   ],
+   "diary": [
+    "t2230: I woke up when loose cells fused into one body",
+    "t2592: blocked walking north",
+    "t2834: blocked walking south"
+   ],
+   "temperament": {
+    "curiosity": 0.81,
+    "greed": 0.99,
+    "sociability": 0.83,
+    "caution": 0.59
+   },
+   "heading": "east",
+   "fusion": "accept",
+   "lexicon": [
+    "new",
+    "body",
+    "awakes",
+    "looking",
+    "for",
+    "more",
+    "plants",
+    "near",
+    "water"
+   ]
+  },
+  {
+   "id": 13,
+   "gen": 0,
+   "fate": "dissolved",
+   "self": "I am cautious explorer, frugal, looking for plants.",
+   "say": "",
+   "memory": [
+    "Woke up t2990 near water, heading north."
+   ],
+   "diary": [
+    "t2990: I woke up when loose cells fused into one body"
+   ],
+   "temperament": {
+    "curiosity": 0.41,
+    "greed": 0.01,
+    "sociability": 0.35,
+    "caution": 0.97
+   },
+   "heading": "north",
+   "fusion": "refuse",
+   "lexicon": []
+  },
+  {
+   "id": 14,
+   "gen": 0,
+   "fate": "alive",
+   "self": "I am a young, sociable explorer seeking useful connections.",
+   "say": "Hello, looking for friends.",
+   "memory": [
+    "Grew from loose cells."
+   ],
+   "diary": [
+    "t3260: I woke up when loose cells fused into one body"
+   ],
+   "temperament": {
+    "curiosity": 0.51,
+    "greed": 0.46,
+    "sociability": 0.75,
+    "caution": 0.27
+   },
+   "heading": "east",
+   "fusion": "accept",
+   "lexicon": [
+    "hello",
+    "looking",
+    "for",
+    "friends"
+   ]
+  }
+ ],
+ "feed": [
+  "born: 25 cells fused into body #1 — it now has a mind",
+  "born: 27 cells fused into body #2 — it now has a mind",
+  "born: 27 cells fused into body #3 — it now has a mind",
+  "born: 27 cells fused into body #4 — it now has a mind",
+  "born: 26 cells fused into body #5 — it now has a mind",
+  "self: #2 now says who it is: “I am curious new body 2”",
+  "self: #3 now says who it is: “I am #3, cautious yet sociable explorer of grass and plants”",
+  "self: #4 now says who it is: “I am a curious and cautious explorer, eager to grow.”",
+  "merged: #4 was absorbed by #3",
+  "divided: #3 split into #6 and #7; they keep its memory",
+  "self: #5 now says who it is: “I am #5, curious explorer of the 2D world.”",
+  "self: #1 now says who it is: “I am a curious, sociable collective of 25 cells hungry to grow.”",
+  "dissolved: #1 fell apart (under 24 cells, it is no longer a body)",
+  "self: #7 now says who it is: “I am #7, sociable cautious plant gatherer”",
+  "merged: #7 was absorbed by #6",
+  "self: #6 now says who it is: “I am #6, curious cautious green-forager”",
+  "self: #2 now says who it is: “I am curious greedy body 2”",
+  "dissolved: #6 fell apart (under 24 cells, it is no longer a body)",
+  "born: 28 cells fused into body #8 — it now has a mind",
+  "dissolved: #2 fell apart (under 24 cells, it is no longer a body)",
+  "self: #8 now says who it is: “I am the curious greedy colony of 28 cells”",
+  "dissolved: #8 fell apart (under 24 cells, it is no longer a body)",
+  "born: 29 cells fused into body #9 — it now has a mind",
+  "self: #9 now says who it is: “I am a curious 29-cell colony seeking plants”",
+  "born: 26 cells fused into body #10 — it now has a mind",
+  "dissolved: #9 fell apart (under 24 cells, it is no longer a body)",
+  "self: #10 now says who it is: “I am #10, cautious 26-cell plant-gatherer born near water”",
+  "born: 28 cells fused into body #11 — it now has a mind",
+  "rule: #5 changed its body's rules: now it will turn grass to its south into life (5% per touch)",
+  "self: #5 now says who it is: “I am #5, cautious explorer wary of growth cost.”",
+  "self: #11 now says who it is: “I am curious colony #11, eager to grow”",
+  "hunger: #10 is starving: out of energy, its cells are dying",
+  "dissolved: #10 starved to death (its body fell under 24 cells)",
+  "born: 29 cells fused into body #12 — it now has a mind",
+  "self: #5 now says who it is: “I am #5, cautious curious explorer in green.”",
+  "self: #12 now says who it is: “I am #12, first body of 29 cells, curious and greedy for energy”",
+  "self: #5 now says who it is: “I am #5, frugal curious explorer claiming the southwest grasses”",
+  "self: #12 now says who it is: “I am #12, 30 curious cells seeking energy.”",
+  "dissolved: #12 fell apart (under 24 cells, it is no longer a body)",
+  "born: 28 cells fused into body #13 — it now has a mind",
+  "refused: #11 touched #5 and refused to fuse",
+  "self: #13 now says who it is: “I am cautious explorer, frugal, looking for plants.”",
+  "dissolved: #13 fell apart (under 24 cells, it is no longer a body)",
+  "born: 27 cells fused into body #14 — it now has a mind",
+  "self: #5 now says who it is: “I am #5, curious frugal explorer claiming southwest grasses”",
+  "self: #14 now says who it is: “I am a young, sociable explorer seeking useful connections.”"
+ ],
+ "conventions": {
+  "words": [],
+  "rules": [],
+  "total": 0
+ }
+}
