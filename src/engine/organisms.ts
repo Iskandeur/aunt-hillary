@@ -10,6 +10,8 @@ import { bornText, createFeed, dissolvedText, dividedText, mergedText, pushFeed,
 export const MIN_SIZE = 24
 /** At 150, one body swallowed every newcomer and hovered just under the line: nobody ever divided. */
 export const DIVIDE_SIZE = 90
+export const MATURE_AGE = 600
+export const isYoung = (o: Organism, tick: number) => o.parent !== null && tick - o.born < MATURE_AGE
 export const MAX_MINDS = 8
 
 // ---------------------------------------------------------------- energy (what is at stake)
@@ -416,6 +418,7 @@ export function divideOversized(world: World, colony: Colony): number[] {
   const cut: number[] = []
   for (const o of colony.orgs.values()) {
     if (!o.alive || o.size <= DIVIDE_SIZE) continue
+    if (isYoung(o, world.tick)) continue
     let minX = Infinity, maxX = -1, minY = Infinity, maxY = -1
     for (let i = 0; i < owner.length; i++) {
       if (owner[i] !== o.id) continue
