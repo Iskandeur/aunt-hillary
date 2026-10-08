@@ -455,3 +455,18 @@ eating rules, 3/20 rules at all. Showing the form is not enough; giving the cont
 **Lesson for the next cycle:** the lever is not knowing *how* to eat, it is learning *that it pays*.
 Minds never hear what their rules did. Cost: 0.10 € (95 probe calls, 2 runs). Two seasons in a row
 without gain (11 and 12): cycle 4 stops, cycle 5 starts at season 13.
+
+## Season 13 — a rule that pays says so, probed and dropped (no gain, nothing run)
+
+**Hypothesis:** minds never hear what their rules did. If the diary says it when a mind thinks
+("my rules ate 12 plants since I last thought: +36 energy, grew 8 cells", or "my rules did nothing"),
+minds with a barren rule switch to eating, and minds with an eating rule keep it.
+
+**Probe** (`probe-payoff.ts`, one fed body, 37 plants in view, 20 calls per arm): barren rule
+(grass → plant), silent diary: ends with an eating rule 1/20; barren rule + "did nothing": 0/20.
+Eating rule, silent: still eating 20/20; eating rule + "ate 12 plants": 20/20. The line is *noticed*
+(thoughts and notes about eating 9/20 → 18/20) but changes no choice: minds that eat keep eating
+either way, and minds that do not are not moved by hearing that nothing happened.
+
+No run paid. A barren rule is rewritten almost every time anyway (18-19/20), just not into an eating
+one. Cost: 0.035 € of probe calls.
