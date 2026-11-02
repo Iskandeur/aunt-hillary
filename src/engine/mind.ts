@@ -190,8 +190,9 @@ export const INITIAL_VOCAB = new Set([...words(SYSTEM_PROMPT), ...EL_NAMES, ...w
 ), ...['food', 'kin', 'water', 'ground', 'void', 'hungry', 'gift'], // the demo minds' concepts are given too
 ...Object.values(TRAIT_WORDS).flat().flatMap(words)]) // and so is their nature: "frugal" was counted 65 times (garden season 7)
 
-/** Real English too rare for both frequency lists, said by the minds in the garden (seasons 6-7). */
-const RARE_ENGLISH = new Set(['abound', 'beckon', 'awoken', 'sib', 'sibs'])
+/** Real English too rare for both frequency lists, said by the minds in the garden ("sib", season 7;
+ *  "forage", seen in season 20's probe). Their -ed/-ing/-er forms follow through the endings below. */
+const RARE_ENGLISH = new Set(['abound', 'beckon', 'awoken', 'sib', 'sibs', 'forage'])
 const known = (w: string) => w.length >= 3 && (COMMON_ENGLISH.has(w) || INITIAL_VOCAB.has(w) || RARE_ENGLISH.has(w))
 const ENDINGS = ['s', 'es', 'ed', 'd', 'ing', 'ly', 'er', 'ers', 'est', 'ness', 'ful', 'less', 'ment', 'ish', 'ward', 'wards']
 /** The words a known word could come from once an ending is taken off: glow-ing, glid(e)-ing,
