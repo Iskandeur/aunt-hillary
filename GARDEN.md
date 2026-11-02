@@ -470,3 +470,69 @@ either way, and minds that do not are not moved by hearing that nothing happened
 
 No run paid. A barren rule is rewritten almost every time anyway (18-19/20), just not into an eating
 one. Cost: 0.035 € of probe calls.
+
+## Seasons 14 to 20 — probes, instruments, no engine change kept (October 2026)
+
+One line for the record. Season 14 wrote the probe for "an explicit request for energy"; season 15 was
+suspended while the minds moved to a batched thinking relay; seasons 16 to 19 probed gift-giving and
+measured that the scene it needs is too rare in a live run for a verbal lever to show; season 20 fixed
+the minds' language at the relay, where they had started answering in French. No engine change was
+kept in those seven seasons. The detail lives in the garden's own state file.
+
+## Season 21 — the identity gap is the thought ration, not the queue (instrument kept, lead closed)
+
+**Hypothesis.** Individuality is the weakest dimension: handfuls of living bodies carry a self-portrait
+they wrote. If a body that has never had a thought of its own takes priority in the queue, more bodies
+form an identity before they divide — at the same cost, since it reorders the turns without adding one.
+
+**Seen first.** Two five-minute runs, seeds 4242 and 4243, real minds, ~14 thoughts each.
+
+| | 4242 | 4243 |
+|---|---|---|
+| thoughts / divisions in 5 min | 14 / 35 | 14 / 24 |
+| living bodies (mean) | 4.97 | 4.53 |
+| distinct "I am" / living minds | 1.93 / 4.97 | 2.17 / 4.53 |
+| self written by the mind wearing it | 1 % | 4 % |
+| self inherited from the parent | 82 % | 79 % |
+
+Twenty-eight paid thoughts for fifty-nine divisions, and 285 samples of living bodies of which 8 (3 %)
+carried an identity they had written themselves. The order of the queue is not where the gap is: a body
+is created with `nextThink = 0`, so the newborn already goes before the elder.
+
+**Bench, no model call** (a free bench run with the garden's own tooling, three seeds at the relay's pace — one thought per
+20 s, an eating rule imposed). It reproduces the live rates: 45 thoughts for 112 divisions, 6.3 living
+bodies per run and 37 divisions per seed, against 4.5-5.0 and 24-35 in play. Two arms against the
+engine as it is:
+
+| arm | distinct selves | living / run | divisions | has spoken |
+|---|---|---|---|---|
+| as is | 2.32 | 6.3 | 112 | 13 % |
+| never-spoken minds first | 2.70 | 4.7 | 96 | 19 % |
+| children inherit no self | 0.81 | 6.3 | 112 | 13 % |
+
+"Has spoken" counts a body that had a thought of its own delivered during the seed; it is not quite
+"wrote a self" (a thought does not always rewrite it), and it is not the live column above either — the
+live runs compare the self a body wears with the thoughts it has had so far.
+
+The first arm looks like a gain and is not one: two seeds of three give identical numbers to the digit,
+and on the only seed where the rule bites the population falls — fewer bodies means fewer selves to tell
+apart. The second empties them: 87 % of samples then have no self at all. The identity a body inherits
+is the only one most of them will ever have, and taking it away does not make them write their own.
+
+**Kept: an instrument fix only.** The game counted `forage` and `foraging` as invented words. They are
+English, simply missing from both frequency lists; season 20's probe, once the relay spoke English
+again, left exactly that one word among the "inventions". `RARE_ENGLISH` now knows `forage`, with a
+unit test covering six forms — the other five follow from the endings the counter
+already strips. Both runs of this season report **zero invented words** — the first clean language reading
+since season 1 — so the fix moves no number here; it stops the counter from inventing one later.
+
+**Not run, not kept:** the ordering arm and the inheritance arm.
+
+**What this closes.** The individuality lead has no cheap lever left. What caps it is the number of
+thoughts per body, and that is capped by money: a thought costs about a cent, so lifting the rate from
+~3 to ~12 a minute would cost ~$8 an hour against a 0.60 €/h guardrail. Season 22 starts from what
+remains: the dashboard's own cost line, which has read 0 €/h since the batched relay took over the
+pricing. This season's two runs cost $0.1521 and $0.1669 — about $1.8 and $2.0 an hour by the relay's
+meter.
+
+Cost: $0.32 of paid turns, 0 € of probes.

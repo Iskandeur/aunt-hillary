@@ -203,6 +203,11 @@ test('isInvented: their own nature, directions and contractions are not inventio
   for (const w of ['zukaward', 'kelumi', 'oooo']) assert.equal(isInvented(w), true, w)
 })
 
+test('isInvented: foraging is English, not an invention (garden season 20-21)', () => {
+  // The only "invented" word left after the relay spoke English: absent from both frequency lists.
+  for (const w of ['forage', 'foraging', 'foraged', 'forages', 'forager', 'foragers']) assert.equal(isInvented(w), false, w)
+})
+
 test('demo minds differ by nature, and the world does not freeze', () => {
   const sim = createSim(7)
   let t = 0
