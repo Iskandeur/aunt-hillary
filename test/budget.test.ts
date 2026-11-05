@@ -4,7 +4,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { DIVIDE_SIZE, activeMinds, createColony, heirOf, type Organism } from '../src/engine/organisms.ts'
 import { MAX_CHANCE, validateRule } from '../src/engine/mind.ts'
-import { createSim, frame, think, THOUGHT_GAP_MS, type Sim } from '../src/engine/sim.ts'
+import { createSim, frame, think, MAX_IN_FLIGHT, THOUGHT_GAP_MS, type Sim } from '../src/engine/sim.ts'
 import { LIFE, count } from '../src/engine/world.ts'
 
 const REPLY = '{"thought":"hm","say":"lo","rules":[]}'
@@ -49,7 +49,7 @@ test('LLM minds take turns: one thought per gap, however many minds', async () =
   }
 })
 
-test('never more than one LLM thought in flight', async () => {
+test('never more than MAX_IN_FLIGHT LLM thoughts in flight, and they do overlap', async () => {
   let pending = 0
   let peak = 0
   const f = withFetch(async () => {
@@ -64,7 +64,7 @@ test('never more than one LLM thought in flight', async () => {
       think(sim, t, 5000, 0)
       await tick()
     }
-    assert.equal(peak, 1)
+    assert.equal(peak, MAX_IN_FLIGHT)
   } finally {
     f.restore()
   }

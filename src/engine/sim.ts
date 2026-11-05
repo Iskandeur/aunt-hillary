@@ -204,6 +204,9 @@ function deliver(sim: Sim, org: Organism, reply: MindReply): void {
   }
 }
 
+/** Thoughts on the wire at once: the relay batches whatever arrives within its window into one turn. */
+export const MAX_IN_FLIGHT = 4
+
 export interface ThinkOptions {
   /** Demo minds take turns too: at most one new demo thought per demoGapMs (0 = each on its own cadence). */
   demoGapMs?: number
@@ -255,18 +258,25 @@ export function think(sim: Sim, now: number, thinkMs = THINK_MS, gapMs = THOUGHT
   }
   if (now < sim.busyUntil) return
   sim.status = ''
-  if (sim.inFlight > 0 || now < sim.nextThoughtAt) return
-  // The mind that has waited longest goes next.
-  const org = minds.filter((o) => !o.thinking && now >= o.nextThink).sort((a, b) => a.nextThink - b.nextThink)[0]
-  if (!org) return
+  if (sim.inFlight >= MAX_IN_FLIGHT || now < sim.nextThoughtAt) return
+  // The minds that have waited longest go next, up to MAX_IN_FLIGHT thoughts on the wire at once.
+  const next = minds.filter((o) => !o.thinking && now >= o.nextThink).sort((a, b) => a.nextThink - b.nextThink)
+  if (!next.length) return
+  // Same spend per minute as before: a batch of n thoughts earns n gaps of rest, so batching only
+  // changes how many minds share one paid turn, never how many thoughts per minute are bought.
+  const batch = next.slice(0, MAX_IN_FLIGHT - sim.inFlight)
+  sim.nextThoughtAt = now + gapMs * batch.length
+  for (const org of batch) startThought(sim, org, now, thinkMs)
+}
+
+function startThought(sim: Sim, org: Organism, now: number, thinkMs: number): void {
   org.nextThink = now + thinkMs
-  sim.nextThoughtAt = now + gapMs
   const neighbors = neighborsOf(org.id, sim.edges).map((id) => sim.colony.orgs.get(id)!).filter(Boolean)
   org.thinking = true
   sim.inFlight++
   const ctl = new AbortController()
   const timer = setTimeout(() => ctl.abort(), 30000)
-  llmMind(sim.llm, buildMessages(sim.world, org, neighbors, sim.colony), ctl.signal)
+  llmMind(sim.llm!, buildMessages(sim.world, org, neighbors, sim.colony), ctl.signal)
     .then(({ reply, errors, busy }) => {
       if (busy) {
         // Not an error: the endpoint asked us to slow down. Minds wait quietly, nothing is lost.
