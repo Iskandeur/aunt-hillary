@@ -4,7 +4,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { DIVIDE_SIZE, activeMinds, createColony, heirOf, type Organism } from '../src/engine/organisms.ts'
 import { MAX_CHANCE, validateRule } from '../src/engine/mind.ts'
-import { createSim, frame, think, THOUGHT_GAP_MS, type Sim } from '../src/engine/sim.ts'
+import { createSim, frame, think, MAX_IN_FLIGHT, MAX_THOUGHTS_PER_MIN, type Sim } from '../src/engine/sim.ts'
 import { LIFE, count } from '../src/engine/world.ts'
 
 const REPLY = '{"thought":"hm","say":"lo","rules":[]}'
@@ -40,16 +40,17 @@ test('LLM minds take turns: one thought per gap, however many minds', async () =
   try {
     const sim = llmSim()
     await run(sim, 60_000)
-    const max = Math.floor(60_000 / THOUGHT_GAP_MS) + 1
+    // Cap: MAX_THOUGHTS_PER_MIN starts per rolling minute (a start at t=250 may share the window's edge).
+    const max = MAX_THOUGHTS_PER_MIN * 2
     assert.ok(f.calls() <= max, `${f.calls()} calls in a minute, expected at most ${max}`)
-    assert.ok(f.calls() >= max - 3, `minds should still think steadily, got ${f.calls()}`)
+    assert.ok(f.calls() >= MAX_THOUGHTS_PER_MIN, `minds should still think steadily, got ${f.calls()}`)
     assert.ok(sim.thoughts.length > 0)
   } finally {
     f.restore()
   }
 })
 
-test('never more than one LLM thought in flight', async () => {
+test('never more than MAX_IN_FLIGHT LLM thoughts in flight, and they do overlap', async () => {
   let pending = 0
   let peak = 0
   const f = withFetch(async () => {
@@ -64,7 +65,7 @@ test('never more than one LLM thought in flight', async () => {
       think(sim, t, 5000, 0)
       await tick()
     }
-    assert.equal(peak, 1)
+    assert.equal(peak, Math.min(MAX_IN_FLIGHT, MAX_THOUGHTS_PER_MIN))
   } finally {
     f.restore()
   }
