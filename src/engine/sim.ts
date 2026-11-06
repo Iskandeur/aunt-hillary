@@ -27,6 +27,8 @@ export interface Sim {
   inFlight: number
   /** Clock time before which no new LLM thought starts (turn-taking). */
   nextThoughtAt: number
+  /** Clock times of LLM thoughts started in the last minute (the spend cap). */
+  started: number[]
   /** Clock time until which the endpoint asked us to wait. */
   busyUntil: number
   /** Set by the UI when nobody has touched the page for a while: LLM minds sleep, physics goes on. */
@@ -76,7 +78,7 @@ export function createSim(seed = 7, w = 64, h = 64): Sim {
   const rules = DEFAULT_RULES.map((r) => ({ ...r }))
   return {
     world, colony: createColony(), rules, compiled: rules.map(compile), edges: [], llm: null, lastError: '', thoughts: [],
-    inFlight: 0, nextThoughtAt: 0, busyUntil: 0, idle: false, status: '', clock: 0, pending: [], met: new Set(), lastSpawn: 0,
+    inFlight: 0, nextThoughtAt: 0, started: [], busyUntil: 0, idle: false, status: '', clock: 0, pending: [], met: new Set(), lastSpawn: 0,
   }
 }
 
@@ -207,6 +209,9 @@ function deliver(sim: Sim, org: Organism, reply: MindReply): void {
 /** Thoughts on the wire at once: the relay batches whatever arrives within its window into one turn. */
 export const MAX_IN_FLIGHT = 4
 
+/** Paid thoughts per rolling minute, whatever the pace: batching shares a turn, it must not buy more thoughts. */
+export const MAX_THOUGHTS_PER_MIN = 3
+
 export interface ThinkOptions {
   /** Demo minds take turns too: at most one new demo thought per demoGapMs (0 = each on its own cadence). */
   demoGapMs?: number
@@ -262,10 +267,14 @@ export function think(sim: Sim, now: number, thinkMs = THINK_MS, gapMs = THOUGHT
   // The minds that have waited longest go next, up to MAX_IN_FLIGHT thoughts on the wire at once.
   const next = minds.filter((o) => !o.thinking && now >= o.nextThink).sort((a, b) => a.nextThink - b.nextThink)
   if (!next.length) return
-  // Same spend per minute as before: a batch of n thoughts earns n gaps of rest, so batching only
-  // changes how many minds share one paid turn, never how many thoughts per minute are bought.
-  const batch = next.slice(0, MAX_IN_FLIGHT - sim.inFlight)
-  sim.nextThoughtAt = now + gapMs * batch.length
+  // Spend cap: at most MAX_THOUGHTS_PER_MIN starts in any rolling minute. A batch shares one paid
+  // relay turn, so batching lowers the price per thought; the cap keeps the price per hour.
+  sim.started = sim.started.filter((t) => now - t < 60_000)
+  const room = Math.min(MAX_IN_FLIGHT - sim.inFlight, MAX_THOUGHTS_PER_MIN - sim.started.length)
+  if (room <= 0) return
+  const batch = next.slice(0, room)
+  sim.nextThoughtAt = now + gapMs
+  for (let i = 0; i < batch.length; i++) sim.started.push(now)
   for (const org of batch) startThought(sim, org, now, thinkMs)
 }
 
