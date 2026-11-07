@@ -536,3 +536,25 @@ pricing. This season's two runs cost $0.1521 and $0.1669 — about $1.8 and $2.0
 meter.
 
 Cost: $0.32 of paid turns, 0 € of probes.
+
+## Seasons 24-26: more thoughts per paid turn, at a flat hourly price
+
+**Hypothesis.** In the live game the relay batched almost nothing: 138 of 139 paid turns served a single
+mind, because `think()` allowed one thought in flight. If up to four can be in flight, one turn serves
+several minds and a thought gets cheaper, without the game costing more per hour.
+
+**Season 24 — arm without a brake, not kept.** Up to four thoughts in flight: 3.9 minds per turn and
+$0.0080 per thought (−31 %), but 59 thoughts in five minutes instead of ~14, so $5.55 an hour instead of
+~$2, and a notable moment every 4 seconds. A cheaper thought that makes the whole game dearer is not a gain.
+
+**Season 25 — rolling cap, kept.** Same change, plus at most three thought starts per rolling minute
+(`MAX_THOUGHTS_PER_MIN`). Seed 4242: 15 thoughts in 8 turns, $1.52 an hour, $0.0086 per thought (−26 %),
+2.4 distinct selves (before: 1.3–2.2).
+
+**Season 26 — control on a second seed, kept.** Seed 4243, merged build: 15 thoughts in 10 turns
+(1.5 minds per turn), $1.75 an hour, $0.0098 per thought (−16 %), 2.83 distinct selves for 5.4 bodies
+alive, 31 divisions, no invented word. Both criteria (≤ $2 an hour, > 2.2 distinct selves) hold on both
+seeds; the saving per thought is smaller than the first run suggested, so read it as "−16 to −26 %".
+
+**What it does not fix.** A notable moment still happens every ~5 seconds at the Slow pace (74 physical,
+13 mental), against a target of one per 20–30 s. That is now the weakest dimension.
